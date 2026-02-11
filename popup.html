@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legal Clipper</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+  <!-- LOCK SCREEN -->
+  <div id="lock-screen" class="lock-screen" style="display: none;">
+    <div class="lock-content">
+      <div class="lock-icon">&#9878;</div>
+      <h2 class="lock-title">Legal Clipper</h2>
+      <p id="lock-desc" class="lock-desc">Enter team password to continue</p>
+      <input type="password" id="lock-input" class="lock-input" placeholder="Team password" autocomplete="off" />
+      <div id="lock-error" class="lock-error" style="display: none;">Incorrect password</div>
+      <button id="btn-unlock" class="btn btn-primary btn-full">Unlock</button>
+    </div>
+  </div>
+
+  <!-- SETUP SCREEN (first time only) -->
+  <div id="setup-screen" class="lock-screen" style="display: none;">
+    <div class="lock-content">
+      <div class="lock-icon">&#9878;</div>
+      <h2 class="lock-title">Welcome to Legal Clipper</h2>
+      <p class="lock-desc">Set a team password. Share it with your team so they can use the extension.</p>
+      <input type="text" id="setup-input" class="lock-input" placeholder="Choose a team password" autocomplete="off" style="letter-spacing: 0;" />
+      <div id="setup-error" class="lock-error" style="display: none;">Please enter a password</div>
+      <button id="btn-setup" class="btn btn-primary btn-full">Set Password & Continue</button>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app-main" style="display: none;">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <span class="header-icon">&#9878;</span>
+      <h1>Legal Clipper</h1>
+    </div>
+    <nav class="header-nav">
+      <button class="nav-btn active" data-view="capture">Capture</button>
+      <button class="nav-btn" data-view="brain">Brain</button>
+      <button class="nav-btn" data-view="settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- CAPTURE VIEW -->
+  <div id="view-capture" class="view active">
+    <!-- Empty state: no text selected -->
+    <div id="empty-state" class="empty-state">
+      <div class="empty-icon">&#128270;</div>
+      <p class="empty-title">No text captured yet</p>
+      <p class="empty-desc">Highlight text on any page and click the <strong>Capture</strong> button, or right-click and select <em>"Capture for Legal Clipper"</em>.</p>
+      <p class="empty-desc" style="margin-top: 8px; color: #9ca3af;">Working with a PDF or can't highlight?</p>
+      <button id="btn-manual" class="btn btn-secondary" style="margin-top: 6px;">&#128221; Paste Manually</button>
+    </div>
+
+    <!-- Manual paste form -->
+    <div id="manual-form" style="display: none;">
+      <div class="captured-text-container">
+        <label class="field-label" for="manual-text">Paste Text <span class="required">*</span></label>
+        <textarea id="manual-text" class="why-input" placeholder="Paste the legal text here..." rows="4"></textarea>
+        <div id="manual-text-error" class="field-error" style="display: none;">Please paste the text you want to capture.</div>
+      </div>
+      <div class="source-inputs" style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <div style="flex: 1;">
+          <label class="field-label" for="manual-source">Source Name <span class="required">*</span></label>
+          <input type="text" id="manual-source" class="tag-input" style="width: 100%; padding: 8px 10px;" placeholder="e.g., Smith v. Jones" />
+          <div id="manual-source-error" class="field-error" style="display: none;">Please enter a source name.</div>
+        </div>
+        <div style="flex: 1;">
+          <label class="field-label" for="manual-url">URL <span class="optional">(optional)</span></label>
+          <input type="text" id="manual-url" class="tag-input" style="width: 100%; padding: 8px 10px;" placeholder="https://..." />
+        </div>
+      </div>
+      <div class="action-row">
+        <button id="btn-manual-cancel" class="btn btn-secondary">Cancel</button>
+        <button id="btn-manual-next" class="btn btn-primary">Next</button>
+      </div>
+    </div>
+
+    <!-- Capture form -->
+    <div id="capture-form" class="capture-form" style="display: none;">
+      <!-- Source badge -->
+      <div class="source-row">
+        <span id="source-badge" class="source-badge">Website</span>
+        <a id="source-link" class="source-link" href="#" target="_blank" title="Open source">
+          <span id="source-title" class="source-title"></span>
+        </a>
+      </div>
+
+      <!-- Captured text -->
+      <div class="captured-text-container">
+        <label class="field-label">Captured Text</label>
+        <div id="captured-text" class="captured-text"></div>
+      </div>
+
+      <!-- Why is this crucial? -->
+      <div class="why-container">
+        <label class="field-label" for="why-input">
+          Why is this crucial?
+          <span class="required">*</span>
+        </label>
+        <textarea
+          id="why-input"
+          class="why-input"
+          placeholder="e.g., This judge rejected the standard 'browsewrap' defense — we can use this in the Smith case."
+          rows="3"
+        ></textarea>
+        <div id="why-error" class="field-error" style="display: none;">Please explain why this matters before saving.</div>
+      </div>
+
+      <!-- Case Name -->
+      <div class="coa-container">
+        <label class="field-label">Case Name <span class="optional">(optional)</span></label>
+        <div class="capture-case-row">
+          <select id="capture-case-select" class="coa-select" style="flex:1;">
+            <option value="">— None —</option>
+          </select>
+          <input type="text" id="capture-case-new-input" class="tag-input" placeholder="Type case name..." style="display:none; flex:1; padding:8px 10px;" />
+        </div>
+        <div class="session-default-row">
+          <label class="session-default-label">
+            <input type="checkbox" id="session-default-check" />
+            Set as session default
+          </label>
+          <span id="session-default-badge" class="session-default-badge" style="display:none;"></span>
+        </div>
+      </div>
+
+      <!-- Cause of Action -->
+      <div class="coa-container">
+        <label class="field-label">Cause of Action <span class="optional">(optional)</span></label>
+        <select id="coa-select" class="coa-select">
+          <option value="">— None —</option>
+          <option value="CIPA">CIPA</option>
+          <option value="IRPA">IRPA</option>
+          <option value="ECPA">ECPA</option>
+          <option value="ERISA">ERISA</option>
+          <option value="PRICING">PRICING</option>
+          <option value="GREENWASHING">GREENWASHING</option>
+        </select>
+      </div>
+
+      <!-- Rating -->
+      <div class="coa-container">
+        <label class="field-label">Rating <span class="optional">(optional)</span></label>
+        <div class="capture-rating-btns" id="capture-rating-btns">
+          <button type="button" class="capture-rating-btn" data-rating="Helpful" title="Helpful">&#9989; Helpful</button>
+          <button type="button" class="capture-rating-btn" data-rating="Negative" title="Negative">&#9888;&#65039; Negative</button>
+          <button type="button" class="capture-rating-btn" data-rating="Neutral" title="Neutral">&#10134; Neutral</button>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-row">
+        <button id="btn-cancel" class="btn btn-secondary">Cancel</button>
+        <button id="btn-save" class="btn btn-primary">
+          <span id="btn-save-text">Save to Brain</span>
+          <span id="btn-save-spinner" class="spinner" style="display: none;"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div id="success-state" class="success-state" style="display: none;">
+      <div class="success-icon">&#9989;</div>
+      <p class="success-title">Saved to Brain!</p>
+      <p class="success-desc">Your finding has been filed in the Knowledge Bank. You can broadcast it anytime from the Brain tab.</p>
+      <button id="btn-new-capture" class="btn btn-primary btn-full">Capture Another</button>
+    </div>
+  </div>
+
+  <!-- BRAIN VIEW (Knowledge Bank) -->
+  <div id="view-brain" class="view">
+    <div class="brain-header">
+      <input type="text" id="brain-search" class="brain-search" placeholder="Search the Knowledge Bank..." />
+      <div class="brain-header-buttons">
+        <button id="btn-export" class="btn btn-secondary btn-half">&#128230; Export CSV</button>
+        <button id="btn-case-report" class="btn btn-secondary btn-half">&#128203; Case Report</button>
+      </div>
+    </div>
+
+    <!-- Case Report Panel -->
+    <div id="case-report-panel" class="case-report-panel" style="display: none;">
+      <label class="field-label">Select Case</label>
+      <select id="case-report-select" class="coa-select">
+        <option value="">— Pick a case —</option>
+      </select>
+      <button id="btn-generate-report" class="btn btn-primary btn-full" style="margin-top: 8px;">Generate Report</button>
+      <div id="case-report-output" style="display: none; margin-top: 10px;">
+        <div id="case-report-text" class="brain-broadcast-text"></div>
+        <button id="btn-copy-report" class="btn btn-secondary btn-full">&#128203; Copy to Clipboard</button>
+        <p id="report-copy-feedback" class="brain-copy-feedback" style="display: none;">Copied!</p>
+      </div>
+      <button id="btn-close-report" class="btn btn-secondary btn-full" style="margin-top: 6px;">Close</button>
+    </div>
+    <div id="brain-loading" class="brain-loading" style="display: none;">
+      <span class="spinner"></span> Loading...
+    </div>
+    <div id="brain-empty" class="empty-state" style="display: none;">
+      <div class="empty-icon">&#128218;</div>
+      <p class="empty-title">Knowledge Bank is empty</p>
+      <p class="empty-desc">Start capturing legal findings and they'll appear here.</p>
+    </div>
+    <div id="brain-list" class="brain-list"></div>
+  </div>
+
+  <!-- SETTINGS VIEW -->
+  <div id="view-settings" class="view">
+    <div class="settings-section">
+      <label class="field-label" for="user-name">Your Name</label>
+      <input type="text" id="user-name" class="settings-input" placeholder="e.g., Jane Smith" />
+      <p class="settings-hint">This appears on your captured clips and broadcast messages.</p>
+    </div>
+    <div class="settings-section">
+      <button id="btn-save-settings" class="btn btn-primary btn-full">Save Settings</button>
+      <p id="settings-feedback" class="settings-feedback" style="display: none;"></p>
+    </div>
+  </div>
+
+  </div><!-- end #app-main -->
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legal Clipper — Brain Dashboard</title>
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: #f0f2f7;
+    color: #1a1a2e;
+    min-height: 100vh;
+  }
+
+  /* ── Password Screen ── */
+  .lock-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a56db 100%);
+  }
+  .lock-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 40px;
+    width: 380px;
+    max-width: 90vw;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .lock-icon { font-size: 48px; margin-bottom: 12px; }
+  .lock-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+  .lock-subtitle { font-size: 13px; color: #6b7280; margin-bottom: 24px; }
+  .lock-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+  .lock-input:focus { border-color: #1a56db; }
+  .lock-input.shake {
+    animation: shake 0.3s ease-in-out;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  .lock-error {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 8px;
+    display: none;
+  }
+  .lock-btn {
+    width: 100%;
+    padding: 12px;
+    background: #1a56db;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: background 0.2s;
+  }
+  .lock-btn:hover { background: #1945b3; }
+  .lock-setup-note {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 16px;
+    line-height: 1.4;
+  }
+
+  /* ── Dashboard Layout ── */
+  .dashboard { display: none; }
+  .dashboard.active { display: block; }
+
+  /* Header */
+  .dash-header {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .dash-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .dash-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dash-brand-icon { font-size: 28px; }
+  .dash-brand-text { font-size: 18px; font-weight: 700; color: #1a1a2e; }
+  .dash-brand-sub { font-size: 12px; color: #6b7280; font-weight: 400; margin-left: 8px; }
+  .dash-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .dash-btn {
+    padding: 8px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: #374151;
+  }
+  .dash-btn:hover { border-color: #1a56db; color: #1a56db; }
+  .dash-btn-primary {
+    background: #1a56db;
+    color: #fff;
+    border-color: #1a56db;
+  }
+  .dash-btn-primary:hover { background: #1945b3; }
+
+  /* Filters Row */
+  .dash-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .dash-search {
+    flex: 1;
+    min-width: 200px;
+    padding: 9px 14px 9px 36px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") 12px center no-repeat;
+  }
+  .dash-search:focus { border-color: #1a56db; background-color: #fff; }
+  .dash-filter-select {
+    padding: 9px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    background: #f9fafb;
+    color: #374151;
+    cursor: pointer;
+    outline: none;
+    min-width: 130px;
+  }
+  .dash-filter-select:focus { border-color: #1a56db; }
+
+  /* Stats Bar */
+  .dash-stats {
+    display: flex;
+    gap: 16px;
+    padding: 10px 24px;
+    background: #fff;
+    border-bottom: 1px solid #f3f4f6;
+    flex-wrap: wrap;
+  }
+  .dash-stat {
+    font-size: 12px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .dash-stat-num {
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+
+  /* Main Content */
+  .dash-main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 24px 40px;
+  }
+
+  /* Loading */
+  .dash-loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+    font-size: 15px;
+  }
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e5e7eb;
+    border-top-color: #1a56db;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Empty State */
+  .dash-empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: #9ca3af;
+  }
+  .dash-empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .dash-empty-title { font-size: 18px; font-weight: 600; color: #6b7280; }
+  .dash-empty-desc { font-size: 13px; margin-top: 4px; }
+
+  /* Clip Cards */
+  .clip-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .clip-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px 20px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .clip-card:hover {
+    border-color: #c7d2fe;
+    box-shadow: 0 2px 8px rgba(26,86,219,0.08);
+  }
+  .clip-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .clip-badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .clip-source {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #3730a3;
+    background: #e0e7ff;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+  }
+  .clip-coa {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #b45309;
+    background: #fef3c7;
+    padding: 3px 7px;
+    border-radius: 4px;
+  }
+  .clip-rating-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .clip-rating-badge.helpful { color: #059669; background: #d1fae5; }
+  .clip-rating-badge.negative { color: #dc2626; background: #fee2e2; }
+  .clip-rating-badge.neutral { color: #6b7280; background: #e5e7eb; }
+  .clip-user {
+    font-size: 10px;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+  .clip-date {
+    font-size: 11px;
+    color: #9ca3af;
+  }
+
+  .clip-why {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .clip-text {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.5;
+    max-height: 60px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: max-height 0.3s ease;
+  }
+  .clip-text.expanded {
+    max-height: none;
+  }
+  .clip-text a {
+    color: #1a56db;
+    text-decoration: underline;
+  }
+  .clip-text-toggle {
+    font-size: 11px;
+    color: #1a56db;
+    cursor: pointer;
+    margin-top: 4px;
+    font-weight: 500;
+    display: none;
+  }
+  .clip-text-toggle.visible { display: inline-block; }
+
+  .clip-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .clip-tag {
+    font-size: 11px;
+    background: #f3f4f6;
+    color: #6b7280;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  .clip-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f3f4f6;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .clip-case {
+    font-size: 12px;
+    color: #374151;
+    font-weight: 500;
+  }
+  .clip-case-label { color: #9ca3af; font-weight: 400; }
+
+  /* Case & Rating Controls Row */
+  .clip-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f3f4f6;
+    flex-wrap: wrap;
+  }
+  .clip-case-select {
+    flex: 1;
+    min-width: 140px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 12px;
+    color: #374151;
+    background: #f9fafb;
+    outline: none;
+    cursor: pointer;
+  }
+  .clip-case-select:focus { border-color: #1a56db; }
+  .clip-case-new-input {
+    flex: 1;
+    min-width: 140px;
+    border: 1px solid #1a56db;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 12px;
+    color: #1a1a2e;
+    background: #eff6ff;
+    outline: none;
+  }
+  .clip-rating-btns {
+    display: flex;
+    gap: 4px;
+  }
+  .clip-rating-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .clip-rating-btn:hover { border-color: #c7d2fe; }
+  .clip-rating-btn.active-helpful { background: #d1fae5; border-color: #059669; }
+  .clip-rating-btn.active-negative { background: #fee2e2; border-color: #dc2626; }
+  .clip-rating-btn.active-neutral { background: #e5e7eb; border-color: #6b7280; }
+  .clip-save-indicator {
+    font-size: 10px;
+    color: #059669;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .clip-save-indicator.show { opacity: 1; }
+
+  .clip-link {
+    font-size: 12px;
+    color: #1a56db;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .clip-link:hover { text-decoration: underline; }
+
+  /* Broadcast */
+  .clip-broadcast-btn {
+    font-size: 12px;
+    padding: 5px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    color: #374151;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .clip-broadcast-btn:hover { border-color: #1a56db; color: #1a56db; }
+  .clip-broadcast-card {
+    margin-top: 10px;
+    border: 1px solid #c7d2fe;
+    border-radius: 8px;
+    background: #f5f3ff;
+    padding: 14px;
+    display: none;
+  }
+  .clip-broadcast-card.active { display: block; }
+  .clip-broadcast-text {
+    font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #1a1a2e;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+  }
+  .clip-broadcast-copy {
+    width: 100%;
+    padding: 8px;
+    background: #fff;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .clip-broadcast-copy:hover { border-color: #1a56db; color: #1a56db; }
+  .clip-broadcast-feedback {
+    text-align: center;
+    color: #059669;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 6px;
+    display: none;
+  }
+
+  /* ── Case Report Panel ── */
+  .report-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .report-overlay.active { display: flex; }
+  .report-panel {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    width: 600px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .report-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .report-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #9ca3af;
+    padding: 4px;
+    line-height: 1;
+  }
+  .report-close:hover { color: #374151; }
+  .report-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  .report-select:focus { border-color: #1a56db; }
+  .report-generate-btn {
+    width: 100%;
+    padding: 10px;
+    background: #1a56db;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 16px;
+  }
+  .report-generate-btn:hover { background: #1945b3; }
+  .report-output {
+    display: none;
+  }
+  .report-output.active { display: block; }
+  .report-text {
+    font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #1a1a2e;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+  }
+  .report-copy-btn {
+    width: 100%;
+    padding: 10px;
+    background: #fff;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .report-copy-btn:hover { border-color: #1a56db; color: #1a56db; }
+  .report-feedback {
+    text-align: center;
+    color: #059669;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 8px;
+    display: none;
+  }
+
+  /* ── Refresh indicator ── */
+  .dash-refresh {
+    font-size: 11px;
+    color: #9ca3af;
+    text-align: center;
+    padding: 12px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .dash-header { padding: 12px 16px; }
+    .dash-main { padding: 16px; }
+    .dash-filters { flex-direction: column; }
+    .dash-search { min-width: unset; }
+    .dash-filter-select { width: 100%; }
+    .clip-card { padding: 12px 14px; }
+    .dash-header-top { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .dash-actions { width: 100%; }
+    .dash-btn { flex: 1; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Password Screen ── -->
+<div class="lock-screen" id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-icon">&#128218;</div>
+    <div class="lock-title">Brain Dashboard</div>
+    <div class="lock-subtitle">Legal Clipper — Knowledge Bank</div>
+    <div id="setup-section" style="display: none;">
+      <p style="font-size: 13px; color: #374151; margin-bottom: 16px;">First time here? Set a team password.</p>
+      <input type="password" id="setup-input" class="lock-input" placeholder="Choose a team password" />
+      <div class="lock-error" id="setup-error">Please enter a password</div>
+      <button class="lock-btn" id="btn-setup">Set Password &amp; Enter</button>
+    </div>
+    <div id="unlock-section" style="display: none;">
+      <input type="password" id="unlock-input" class="lock-input" placeholder="Enter team password" />
+      <div class="lock-error" id="unlock-error">Wrong password. Try again.</div>
+      <button class="lock-btn" id="btn-unlock">Unlock</button>
+    </div>
+    <div class="lock-setup-note">Your team data is stored securely in your shared database.</div>
+  </div>
+</div>
+
+<!-- ── Dashboard ── -->
+<div class="dashboard" id="dashboard">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div class="dash-header-top">
+      <div class="dash-brand">
+        <span class="dash-brand-icon">&#128218;</span>
+        <span class="dash-brand-text">Brain Dashboard <span class="dash-brand-sub">Legal Clipper</span></span>
+      </div>
+      <div class="dash-actions">
+        <button class="dash-btn" id="btn-refresh">&#128260; Refresh</button>
+        <button class="dash-btn" id="btn-export-csv">&#128230; Export CSV</button>
+        <button class="dash-btn dash-btn-primary" id="btn-case-report">&#128203; Case Report</button>
+      </div>
+    </div>
+    <div class="dash-filters">
+      <input type="text" class="dash-search" id="search-input" placeholder="Search clips..." />
+      <select class="dash-filter-select" id="filter-coa">
+        <option value="">All Causes of Action</option>
+      </select>
+      <select class="dash-filter-select" id="filter-case">
+        <option value="">All Cases</option>
+      </select>
+      <select class="dash-filter-select" id="filter-rating">
+        <option value="">All Ratings</option>
+        <option value="Helpful">&#9989; Helpful</option>
+        <option value="Negative">&#9888;&#65039; Negative</option>
+        <option value="Neutral">&#10134; Neutral</option>
+        <option value="__unrated__">&#128204; Unrated</option>
+      </select>
+      <select class="dash-filter-select" id="filter-user">
+        <option value="">All Users</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="dash-stats" id="stats-bar">
+    <div class="dash-stat"><span class="dash-stat-num" id="stat-total">0</span> clips</div>
+    <div class="dash-stat">&#9989; <span class="dash-stat-num" id="stat-helpful">0</span> Helpful</div>
+    <div class="dash-stat">&#9888;&#65039; <span class="dash-stat-num" id="stat-negative">0</span> Negative</div>
+    <div class="dash-stat">&#10134; <span class="dash-stat-num" id="stat-neutral">0</span> Neutral</div>
+    <div class="dash-stat">&#128204; <span class="dash-stat-num" id="stat-cases">0</span> Cases</div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="dash-main">
+    <div class="dash-loading" id="loading"><span class="spinner"></span> Loading clips from database...</div>
+    <div class="dash-empty" id="empty-state" style="display: none;">
+      <div class="dash-empty-icon">&#128218;</div>
+      <div class="dash-empty-title">No clips found</div>
+      <div class="dash-empty-desc">Start capturing legal findings with the Chrome extension!</div>
+    </div>
+    <div class="clip-list" id="clip-list"></div>
+    <div class="dash-refresh" id="refresh-note"></div>
+  </div>
+</div>
+
+<!-- ── Case Report Overlay ── -->
+<div class="report-overlay" id="report-overlay">
+  <div class="report-panel">
+    <div class="report-title">
+      &#128203; Case Report
+      <button class="report-close" id="report-close">&times;</button>
+    </div>
+    <select class="report-select" id="report-case-select">
+      <option value="">— Pick a case —</option>
+    </select>
+    <button class="report-generate-btn" id="report-generate">Generate Report</button>
+    <div class="report-output" id="report-output">
+      <div class="report-text" id="report-text"></div>
+      <button class="report-copy-btn" id="report-copy">&#128203; Copy to Clipboard</button>
+      <div class="report-feedback" id="report-feedback">Copied!</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ── Supabase Config ──
+  const SUPABASE_URL = 'https://enptpydsfxmigfodrjbb.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_L3XRLx45c6FLdRQG7oGLeg_faLqqPEU';
+
+  // ── State ──
+  let allRecords = [];
+  let filteredRecords = [];
+  let knownCaseNames = [];
+
+  // ── DOM ──
+  const lockScreen = document.getElementById('lock-screen');
+  const setupSection = document.getElementById('setup-section');
+  const unlockSection = document.getElementById('unlock-section');
+  const setupInput = document.getElementById('setup-input');
+  const setupError = document.getElementById('setup-error');
+  const btnSetup = document.getElementById('btn-setup');
+  const unlockInput = document.getElementById('unlock-input');
+  const unlockError = document.getElementById('unlock-error');
+  const btnUnlock = document.getElementById('btn-unlock');
+
+  const dashboard = document.getElementById('dashboard');
+  const searchInput = document.getElementById('search-input');
+  const filterCoa = document.getElementById('filter-coa');
+  const filterCase = document.getElementById('filter-case');
+  const filterRating = document.getElementById('filter-rating');
+  const filterUser = document.getElementById('filter-user');
+  const loading = document.getElementById('loading');
+  const emptyState = document.getElementById('empty-state');
+  const clipList = document.getElementById('clip-list');
+  const refreshNote = document.getElementById('refresh-note');
+
+  const btnRefresh = document.getElementById('btn-refresh');
+  const btnExportCsv = document.getElementById('btn-export-csv');
+  const btnCaseReport = document.getElementById('btn-case-report');
+
+  const reportOverlay = document.getElementById('report-overlay');
+  const reportClose = document.getElementById('report-close');
+  const reportCaseSelect = document.getElementById('report-case-select');
+  const reportGenerate = document.getElementById('report-generate');
+  const reportOutput = document.getElementById('report-output');
+  const reportText = document.getElementById('report-text');
+  const reportCopy = document.getElementById('report-copy');
+  const reportFeedback = document.getElementById('report-feedback');
+
+  // ── Password Logic ──
+  const storedPw = localStorage.getItem('brainDashPassword');
+  if (!storedPw) {
+    setupSection.style.display = 'block';
+  } else {
+    unlockSection.style.display = 'block';
+  }
+
+  btnSetup.addEventListener('click', () => {
+    const pw = setupInput.value.trim();
+    if (!pw) { setupError.style.display = 'block'; return; }
+    localStorage.setItem('brainDashPassword', pw);
+    setupError.style.display = 'none';
+    enterDashboard();
+  });
+  setupInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') btnSetup.click(); });
+  setupInput.addEventListener('input', () => { setupError.style.display = 'none'; });
+
+  btnUnlock.addEventListener('click', () => {
+    const entered = unlockInput.value;
+    if (entered === localStorage.getItem('brainDashPassword')) {
+      unlockError.style.display = 'none';
+      enterDashboard();
+    } else {
+      unlockError.style.display = 'block';
+      unlockInput.classList.add('shake');
+      setTimeout(() => unlockInput.classList.remove('shake'), 400);
+      unlockInput.select();
+    }
+  });
+  unlockInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') btnUnlock.click(); });
+  unlockInput.addEventListener('input', () => { unlockError.style.display = 'none'; });
+
+  function enterDashboard() {
+    lockScreen.style.display = 'none';
+    dashboard.classList.add('active');
+    loadData();
+  }
+
+  // ── Supabase Fetch ──
+  async function fetchClips() {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/clips?order=created_at.desc&select=*`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+    return await res.json();
+  }
+
+  function mapRecord(row) {
+    return {
+      id: row.id,
+      timestamp: row.timestamp || row.created_at,
+      user: row.username || '',
+      source: row.source || '',
+      pageTitle: row.page_title || '',
+      url: row.url || '',
+      text: row.captured_text || '',
+      html: row.captured_html || '',
+      why: row.why_it_matters || '',
+      tags: row.tags || '',
+      causeOfAction: row.cause_of_action || '',
+      caseName: row.case_name || '',
+      rating: row.rating || ''
+    };
+  }
+
+  // ── Update Record in Supabase ──
+  async function updateRecord(id, updates) {
+    if (!id) { console.warn('No id for update'); return; }
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/clips?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(updates)
+      });
+      if (!res.ok) console.warn('Update failed:', res.status);
+    } catch (e) {
+      console.warn('Update error:', e);
+    }
+  }
+
+  function flashSaved(idx) {
+    const ind = document.getElementById(`save-ind-${idx}`);
+    if (!ind) return;
+    ind.classList.add('show');
+    setTimeout(() => { ind.classList.remove('show'); }, 1500);
+  }
+
+  // ── Load Data ──
+  async function loadData() {
+    loading.style.display = 'block';
+    emptyState.style.display = 'none';
+    clipList.innerHTML = '';
+
+    try {
+      const rows = await fetchClips();
+      allRecords = rows.map(mapRecord);
+    } catch (err) {
+      loading.style.display = 'none';
+      clipList.innerHTML = '<div class="dash-empty"><div class="dash-empty-icon">&#9888;&#65039;</div><div class="dash-empty-title">Failed to load</div><div class="dash-empty-desc">' + escapeHtml(err.message) + '</div></div>';
+      return;
+    }
+
+    loading.style.display = 'none';
+
+    // Build known case names list
+    knownCaseNames = [...new Set(allRecords.map(r => r.caseName).filter(Boolean))].sort();
+
+    populateFilters();
+    applyFilters();
+
+    refreshNote.textContent = 'Last refreshed: ' + new Date().toLocaleTimeString();
+  }
+
+  // ── Populate Dynamic Filter Dropdowns ──
+  function populateFilters() {
+    // COA
+    const coas = [...new Set(allRecords.map(r => r.causeOfAction).filter(Boolean))].sort();
+    filterCoa.innerHTML = '<option value="">All Causes of Action</option>';
+    coas.forEach(c => { filterCoa.innerHTML += `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`; });
+
+    // Cases
+    const cases = [...new Set(allRecords.map(r => r.caseName).filter(Boolean))].sort();
+    filterCase.innerHTML = '<option value="">All Cases</option>';
+    cases.forEach(c => { filterCase.innerHTML += `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`; });
+
+    // Users
+    const users = [...new Set(allRecords.map(r => r.user).filter(Boolean))].sort();
+    filterUser.innerHTML = '<option value="">All Users</option>';
+    users.forEach(u => { filterUser.innerHTML += `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`; });
+  }
+
+  // ── Apply Filters & Search ──
+  function applyFilters() {
+    const q = searchInput.value.trim().toLowerCase();
+    const coa = filterCoa.value;
+    const caseName = filterCase.value;
+    const rating = filterRating.value;
+    const user = filterUser.value;
+
+    filteredRecords = allRecords.filter(r => {
+      if (coa && r.causeOfAction !== coa) return false;
+      if (caseName && r.caseName !== caseName) return false;
+      if (rating === '__unrated__' && r.rating) return false;
+      if (rating && rating !== '__unrated__' && r.rating !== rating) return false;
+      if (user && r.user !== user) return false;
+
+      if (q) {
+        const searchable = [r.why, r.text, r.tags, r.source, r.pageTitle, r.causeOfAction, r.caseName, r.user].join(' ').toLowerCase();
+        if (!searchable.includes(q)) return false;
+      }
+
+      return true;
+    });
+
+    updateStats();
+    renderClips();
+  }
+
+  // ── Stats ──
+  function updateStats() {
+    document.getElementById('stat-total').textContent = filteredRecords.length;
+    document.getElementById('stat-helpful').textContent = filteredRecords.filter(r => r.rating === 'Helpful').length;
+    document.getElementById('stat-negative').textContent = filteredRecords.filter(r => r.rating === 'Negative').length;
+    document.getElementById('stat-neutral').textContent = filteredRecords.filter(r => r.rating === 'Neutral').length;
+    document.getElementById('stat-cases').textContent = new Set(filteredRecords.map(r => r.caseName).filter(Boolean)).size;
+  }
+
+  // ── Render Clips ──
+  function renderClips() {
+    if (filteredRecords.length === 0) {
+      clipList.innerHTML = '';
+      emptyState.style.display = 'block';
+      return;
+    }
+    emptyState.style.display = 'none';
+
+    clipList.innerHTML = filteredRecords.map((r, i) => {
+      const date = r.timestamp ? new Date(r.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+      const tagsHtml = (r.tags || '').split(',').filter(t => t.trim()).map(t =>
+        `<span class="clip-tag">${escapeHtml(t.trim())}</span>`
+      ).join('');
+      const coaBadge = r.causeOfAction ? `<span class="clip-coa">${escapeHtml(r.causeOfAction)}</span>` : '';
+
+      const userBadge = r.user ? `<span class="clip-user">by ${escapeHtml(r.user)}</span>` : '';
+      const textPreview = r.html ? sanitizeHtml(r.html) : escapeHtml(r.text || '');
+      const needsToggle = (r.text || '').length > 200;
+
+      const currentRating = r.rating || '';
+      const currentCase = r.caseName || '';
+
+      // Build case name dropdown options
+      let caseOptions = '<option value="">— Assign case —</option>';
+      knownCaseNames.forEach(name => {
+        const selected = name === currentCase ? ' selected' : '';
+        caseOptions += `<option value="${escapeHtml(name)}"${selected}>${escapeHtml(name)}</option>`;
+      });
+      if (currentCase && !knownCaseNames.includes(currentCase)) {
+        caseOptions += `<option value="${escapeHtml(currentCase)}" selected>${escapeHtml(currentCase)}</option>`;
+      }
+      caseOptions += '<option value="__add_new__">\u2795 Add new...</option>';
+
+      const urlLink = r.url ? `<a href="${escapeHtml(r.url)}" target="_blank" rel="noopener" class="clip-link">&#128279; View Source</a>` : '';
+
+      return `
+        <div class="clip-card">
+          <div class="clip-header">
+            <div class="clip-badges">
+              <span class="clip-source">${escapeHtml(r.source || 'Web')}</span>
+              ${coaBadge}
+              ${userBadge}
+            </div>
+            <span class="clip-date">${date}</span>
+          </div>
+          <div class="clip-why">${escapeHtml(r.why || '')}</div>
+          <div class="clip-text" data-idx="${i}">${textPreview}</div>
+          ${needsToggle ? `<span class="clip-text-toggle visible" data-idx="${i}">Show more</span>` : ''}
+          ${tagsHtml ? `<div class="clip-tags">${tagsHtml}</div>` : ''}
+          <div class="clip-controls">
+            <select class="clip-case-select" data-idx="${i}">${caseOptions}</select>
+            <input type="text" class="clip-case-new-input" data-idx="${i}" placeholder="Type case name..." style="display: none;" />
+            <div class="clip-rating-btns">
+              <button class="clip-rating-btn ${currentRating === 'Helpful' ? 'active-helpful' : ''}" data-idx="${i}" data-rating="Helpful" title="Helpful">&#9989;</button>
+              <button class="clip-rating-btn ${currentRating === 'Negative' ? 'active-negative' : ''}" data-idx="${i}" data-rating="Negative" title="Negative">&#9888;&#65039;</button>
+              <button class="clip-rating-btn ${currentRating === 'Neutral' ? 'active-neutral' : ''}" data-idx="${i}" data-rating="Neutral" title="Neutral">&#10134;</button>
+            </div>
+            <span class="clip-save-indicator" id="save-ind-${i}">&#10003; Saved</span>
+          </div>
+          <div class="clip-footer">
+            <div>${urlLink}</div>
+            <button class="clip-broadcast-btn" data-idx="${i}">&#128225; Broadcast</button>
+          </div>
+          <div class="clip-broadcast-card" id="broadcast-card-${i}">
+            <div class="clip-broadcast-text" id="broadcast-text-${i}"></div>
+            <button class="clip-broadcast-copy" data-idx="${i}">&#128203; Copy to Clipboard</button>
+            <div class="clip-broadcast-feedback" id="broadcast-feedback-${i}">Copied!</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Attach expand/collapse handlers
+    clipList.querySelectorAll('.clip-text-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = btn.dataset.idx;
+        const textEl = clipList.querySelector(`.clip-text[data-idx="${idx}"]`);
+        if (textEl.classList.contains('expanded')) {
+          textEl.classList.remove('expanded');
+          btn.textContent = 'Show more';
+        } else {
+          textEl.classList.add('expanded');
+          btn.textContent = 'Show less';
+        }
+      });
+    });
+
+    // Attach broadcast button handlers
+    clipList.querySelectorAll('.clip-broadcast-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx);
+        const card = document.getElementById(`broadcast-card-${idx}`);
+        const textEl = document.getElementById(`broadcast-text-${idx}`);
+
+        if (card.classList.contains('active')) {
+          card.classList.remove('active');
+          btn.innerHTML = '&#128225; Broadcast';
+          return;
+        }
+
+        // Close any other open broadcast cards
+        clipList.querySelectorAll('.clip-broadcast-card').forEach(c => c.classList.remove('active'));
+        clipList.querySelectorAll('.clip-broadcast-btn').forEach(b => b.innerHTML = '&#128225; Broadcast');
+
+        textEl.textContent = formatBroadcast(filteredRecords[idx]);
+        card.classList.add('active');
+        btn.textContent = '\u25B2 Hide';
+      });
+    });
+
+    // Attach broadcast copy handlers
+    clipList.querySelectorAll('.clip-broadcast-copy').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const idx = btn.dataset.idx;
+        const text = document.getElementById(`broadcast-text-${idx}`).textContent;
+        const feedback = document.getElementById(`broadcast-feedback-${idx}`);
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (e) {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        feedback.style.display = 'block';
+        setTimeout(() => { feedback.style.display = 'none'; }, 2000);
+      });
+    });
+
+    // ── Case name dropdown handlers ──
+    clipList.querySelectorAll('.clip-case-select').forEach(select => {
+      select.addEventListener('change', () => {
+        const idx = parseInt(select.dataset.idx);
+        const r = filteredRecords[idx];
+
+        if (select.value === '__add_new__') {
+          select.style.display = 'none';
+          const newInput = select.parentElement.querySelector('.clip-case-new-input');
+          newInput.style.display = 'block';
+          newInput.focus();
+          return;
+        }
+
+        const caseName = select.value;
+        r.caseName = caseName;
+        updateRecord(r.id, { case_name: caseName });
+        flashSaved(idx);
+      });
+    });
+
+    // ── "Add new" case input handlers ──
+    clipList.querySelectorAll('.clip-case-new-input').forEach(input => {
+      function commitNewCase() {
+        const idx = parseInt(input.dataset.idx);
+        const r = filteredRecords[idx];
+        const caseName = input.value.trim();
+        const select = input.parentElement.querySelector('.clip-case-select');
+
+        if (caseName) {
+          if (!knownCaseNames.includes(caseName)) {
+            knownCaseNames.push(caseName);
+            knownCaseNames.sort();
+          }
+          // Add option to all dropdowns on the page
+          clipList.querySelectorAll('.clip-case-select').forEach(s => {
+            const exists = Array.from(s.options).some(o => o.value === caseName);
+            if (!exists) {
+              const addNewOpt = s.querySelector('option[value="__add_new__"]');
+              const newOpt = document.createElement('option');
+              newOpt.value = caseName;
+              newOpt.textContent = caseName;
+              s.insertBefore(newOpt, addNewOpt);
+            }
+          });
+          select.value = caseName;
+          r.caseName = caseName;
+          updateRecord(r.id, { case_name: caseName });
+          flashSaved(idx);
+        } else {
+          select.value = r.caseName || '';
+        }
+
+        input.style.display = 'none';
+        select.style.display = 'block';
+        input.value = '';
+      }
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); commitNewCase(); }
+        if (e.key === 'Escape') {
+          const select = input.parentElement.querySelector('.clip-case-select');
+          select.value = filteredRecords[parseInt(input.dataset.idx)].caseName || '';
+          input.style.display = 'none';
+          select.style.display = 'block';
+          input.value = '';
+        }
+      });
+      input.addEventListener('blur', () => { setTimeout(commitNewCase, 150); });
+    });
+
+    // ── Rating button handlers ──
+    clipList.querySelectorAll('.clip-rating-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx);
+        const r = filteredRecords[idx];
+        const rating = btn.dataset.rating;
+        const newRating = (r.rating === rating) ? '' : rating;
+        r.rating = newRating;
+
+        // Update button styles in this row
+        const row = btn.closest('.clip-controls');
+        row.querySelectorAll('.clip-rating-btn').forEach(b => {
+          b.className = 'clip-rating-btn';
+        });
+        if (newRating) {
+          btn.classList.add('active-' + newRating.toLowerCase());
+        }
+
+        updateRecord(r.id, { rating: newRating });
+        flashSaved(idx);
+        updateStats();
+      });
+    });
+  }
+
+  // ── Format Broadcast Message ──
+  function formatBroadcast(record) {
+    const title = record.pageTitle || record.source || 'something interesting';
+    const why = record.why.charAt(0).toLowerCase() + record.why.slice(1);
+    const whyClean = why.replace(/\.\s*$/, '');
+
+    let msg = `Hey team \u2014 found something worth reading: *${title}*\n\n`;
+    msg += `Why it matters: ${whyClean}.\n\n`;
+    msg += `Here is a key quote from the source:\n`;
+
+    let quote = record.text;
+    if (quote.length > 400) {
+      quote = quote.substring(0, 397).replace(/\s+\S*$/, '') + '...';
+    }
+    msg += `> \u201C${quote}\u201D\n\n`;
+
+    if (record.url) msg += `Read more: ${record.url}\n`;
+    if (record.tags) msg += `\n#${record.tags.split(',').map(t => t.trim()).join(' #')}`;
+    return msg;
+  }
+
+  // ── Event Listeners ──
+  let searchTimeout;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(applyFilters, 200);
+  });
+  filterCoa.addEventListener('change', applyFilters);
+  filterCase.addEventListener('change', applyFilters);
+  filterRating.addEventListener('change', applyFilters);
+  filterUser.addEventListener('change', applyFilters);
+
+  btnRefresh.addEventListener('click', loadData);
+
+  // ── CSV Export ──
+  btnExportCsv.addEventListener('click', () => {
+    const data = filteredRecords.length > 0 ? filteredRecords : allRecords;
+    if (data.length === 0) return;
+
+    const headers = ['Timestamp', 'User', 'Source', 'Page Title', 'URL', 'Captured Text', 'Why It Matters', 'Tags', 'Cause of Action', 'Case Name', 'Rating'];
+    const rows = data.map(r => [
+      r.timestamp || '', r.user || '', r.source || '', r.pageTitle || '',
+      r.url || '', r.text || '', r.why || '', r.tags || '',
+      r.causeOfAction || '', r.caseName || '', r.rating || ''
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `legal-clipper-export-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // ── Case Report ──
+  btnCaseReport.addEventListener('click', () => {
+    const caseNames = [...new Set(allRecords.map(r => r.caseName).filter(Boolean))].sort();
+    reportCaseSelect.innerHTML = '<option value="">— Pick a case —</option>';
+    caseNames.forEach(name => {
+      reportCaseSelect.innerHTML += `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`;
+    });
+    if (caseNames.length === 0) {
+      reportCaseSelect.innerHTML = '<option value="">No cases assigned yet</option>';
+    }
+    reportOutput.classList.remove('active');
+    reportOverlay.classList.add('active');
+  });
+
+  reportClose.addEventListener('click', () => { reportOverlay.classList.remove('active'); });
+  reportOverlay.addEventListener('click', (e) => { if (e.target === reportOverlay) reportOverlay.classList.remove('active'); });
+
+  reportGenerate.addEventListener('click', () => {
+    const caseName = reportCaseSelect.value;
+    if (!caseName) return;
+
+    const caseRecords = allRecords.filter(r => r.caseName === caseName);
+    const helpful = caseRecords.filter(r => r.rating === 'Helpful');
+    const negative = caseRecords.filter(r => r.rating === 'Negative');
+    const neutral = caseRecords.filter(r => r.rating === 'Neutral');
+    const unrated = caseRecords.filter(r => !r.rating);
+
+    let report = `\u{1F4CB} CASE: ${caseName}\n\n`;
+
+    function formatSection(title, emoji, items) {
+      if (items.length === 0) return '';
+      let s = `${emoji} ${title}\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n`;
+      items.forEach(r => {
+        const source = r.pageTitle || r.source || 'Unknown source';
+        const why = r.why || '';
+        let quote = r.text || '';
+        if (quote.length > 300) {
+          quote = quote.substring(0, 297).replace(/\s+\S*$/, '') + '...';
+        }
+        s += `\u2022 ${source} \u2014 ${why}\n`;
+        s += `  Key quote: \u201C${quote}\u201D\n`;
+        if (r.url) s += `  Link: ${r.url}\n`;
+        s += '\n';
+      });
+      return s;
+    }
+
+    report += formatSection('HELPFUL', '\u2705', helpful);
+    report += formatSection('NEGATIVE', '\u26A0\uFE0F', negative);
+    report += formatSection('NEUTRAL', '\u2796', neutral);
+    if (unrated.length > 0) {
+      report += formatSection('UNRATED', '\u{1F4CC}', unrated);
+    }
+
+    reportText.textContent = report;
+    reportOutput.classList.add('active');
+  });
+
+  reportCopy.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(reportText.textContent);
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = reportText.textContent;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    reportFeedback.style.display = 'block';
+    setTimeout(() => { reportFeedback.style.display = 'none'; }, 2000);
+  });
+
+  // ── Helpers ──
+  function sanitizeHtml(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    function clean(node) {
+      const result = document.createDocumentFragment();
+      node.childNodes.forEach(child => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          result.appendChild(document.createTextNode(child.textContent));
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          if (child.tagName === 'A' && child.href) {
+            const a = document.createElement('a');
+            a.href = child.href;
+            a.target = '_blank';
+            a.rel = 'noopener';
+            a.textContent = child.textContent;
+            result.appendChild(a);
+          } else if (child.tagName === 'BR') {
+            result.appendChild(document.createElement('br'));
+          } else {
+            result.appendChild(clean(child));
+          }
+        }
+      });
+      return result;
+    }
+    const safeDiv = document.createElement('div');
+    safeDiv.appendChild(clean(div));
+    return safeDiv.innerHTML;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+})();
+</script>
+</body>
+</html>

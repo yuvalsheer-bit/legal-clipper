@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legal Clipper</title>
+  <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  color: #1a1a2e;
+  background: #f0f2f7;
+  min-height: 100vh;
+}
+
+.app-shell {
+  max-width: 540px;
+  margin: 40px auto;
+  background: #f8f9fc;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #1a1a2e;
+  color: #fff;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-icon { font-size: 22px; }
+
+.header h1 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.header-nav {
+  display: flex;
+  gap: 2px;
+}
+
+.nav-btn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-btn:hover {
+  color: #e5e7eb;
+  background: rgba(255,255,255,0.08);
+}
+
+.nav-btn.active {
+  color: #fff;
+  background: rgba(255,255,255,0.12);
+}
+
+/* ── Views ── */
+.view {
+  display: none;
+  padding: 20px;
+}
+
+.view.active {
+  display: block;
+}
+
+/* ── Field Label ── */
+.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #4b5563;
+  margin-bottom: 5px;
+}
+
+.required { color: #dc2626; }
+.optional { font-weight: 400; text-transform: none; color: #9ca3af; }
+
+/* ── Capture Form ── */
+.capture-section { margin-bottom: 16px; }
+
+.paste-input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #1a1a2e;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.15s;
+}
+
+.paste-input:focus {
+  outline: none;
+  border-color: #1a56db;
+  box-shadow: 0 0 0 2px rgba(26,86,219,0.15);
+}
+
+.paste-input.error { border-color: #dc2626; }
+
+.source-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.source-inputs .source-field { flex: 1; }
+
+.text-input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  transition: border-color 0.15s;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #1a56db;
+  box-shadow: 0 0 0 2px rgba(26,86,219,0.15);
+}
+
+.text-input.error { border-color: #dc2626; }
+
+.field-error {
+  color: #dc2626;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.field-hint {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+/* ── Tags ── */
+.tags-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.tag-input {
+  flex: 1;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.tag-input:focus {
+  outline: none;
+  border-color: #1a56db;
+  box-shadow: 0 0 0 2px rgba(26,86,219,0.15);
+}
+
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.tag-chip .tag-remove {
+  cursor: pointer;
+  font-size: 13px;
+  color: #9ca3af;
+  line-height: 1;
+}
+
+.tag-chip .tag-remove:hover { color: #dc2626; }
+
+/* ── Distribution Toggle ── */
+.toggle-group {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.toggle-btn:hover {
+  border-color: #c7d2fe;
+  color: #4b5563;
+}
+
+.toggle-btn.active {
+  border-color: #1a56db;
+  background: #eff6ff;
+  color: #1a56db;
+}
+
+.toggle-btn.active[data-mode="broadcast"] {
+  border-color: #059669;
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.toggle-icon { font-size: 16px; }
+
+.distribution-hint {
+  font-size: 11px;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* ── Action Row ── */
+.action-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-primary {
+  flex: 1;
+  background: #1a56db;
+  color: #fff;
+}
+
+.btn-primary:hover { background: #1e40af; }
+.btn-primary:disabled { background: #93c5fd; cursor: not-allowed; }
+
+.btn-secondary {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.btn-secondary:hover { background: #d1d5db; }
+
+.btn-full { width: 100%; }
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Success State ── */
+.success-state {
+  text-align: center;
+  padding: 30px 16px;
+}
+
+.success-icon { font-size: 44px; margin-bottom: 10px; }
+
+.success-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #059669;
+  margin-bottom: 6px;
+}
+
+.success-desc {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 18px;
+}
+
+/* ── Broadcast Card ── */
+.broadcast-card {
+  text-align: left;
+  margin-bottom: 16px;
+  padding: 14px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+}
+
+.broadcast-content {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #1a1a2e;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.copy-feedback {
+  text-align: center;
+  color: #059669;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* ── Brain View ── */
+.brain-header { margin-bottom: 14px; }
+
+.brain-search {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.brain-search:focus {
+  outline: none;
+  border-color: #1a56db;
+  box-shadow: 0 0 0 2px rgba(26,86,219,0.15);
+}
+
+.brain-loading {
+  text-align: center;
+  padding: 24px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.brain-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.brain-item {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 14px;
+  transition: border-color 0.15s;
+}
+
+.brain-item:hover { border-color: #c7d2fe; }
+
+.brain-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.brain-item-source {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #3730a3;
+  background: #e0e7ff;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.brain-item-date {
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+.brain-item-why {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.brain-item-text {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.5;
+  max-height: 54px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brain-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.brain-item-tag {
+  font-size: 10px;
+  background: #f3f4f6;
+  color: #6b7280;
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+/* ── Empty State ── */
+.empty-state {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.empty-icon { font-size: 40px; margin-bottom: 10px; }
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 6px;
+}
+
+.empty-desc {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* ── Settings ── */
+.settings-section { margin-bottom: 18px; }
+
+.settings-input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.settings-input:focus {
+  outline: none;
+  border-color: #1a56db;
+  box-shadow: 0 0 0 2px rgba(26,86,219,0.15);
+}
+
+.settings-hint {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+.settings-feedback {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.settings-feedback.success { color: #059669; }
+.settings-feedback.error { color: #dc2626; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <span class="header-icon">&#9878;</span>
+      <h1>Legal Clipper</h1>
+    </div>
+    <nav class="header-nav">
+      <button class="nav-btn active" data-view="capture">Capture</button>
+      <button class="nav-btn" data-view="brain">Brain</button>
+      <button class="nav-btn" data-view="settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- CAPTURE VIEW -->
+  <div id="view-capture" class="view active">
+    <div id="capture-form">
+      <!-- Paste text -->
+      <div class="capture-section">
+        <label class="field-label" for="paste-input">
+          Paste Legal Text <span class="required">*</span>
+        </label>
+        <textarea
+          id="paste-input"
+          class="paste-input"
+          placeholder="Paste the relevant legal text here..."
+          rows="5"
+        ></textarea>
+        <div id="paste-error" class="field-error" style="display:none;">Please paste the text you want to capture.</div>
+      </div>
+
+      <!-- Source URL + Title -->
+      <div class="capture-section">
+        <div class="source-inputs">
+          <div class="source-field">
+            <label class="field-label" for="source-url">Source URL <span class="optional">(optional)</span></label>
+            <input type="url" id="source-url" class="text-input" placeholder="https://..." />
+          </div>
+          <div class="source-field">
+            <label class="field-label" for="source-title">Source Name <span class="optional">(optional)</span></label>
+            <input type="text" id="source-title" class="text-input" placeholder="e.g., Smith v. Jones" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Why is this crucial? -->
+      <div class="capture-section">
+        <label class="field-label" for="why-input">
+          Why is this crucial? <span class="required">*</span>
+        </label>
+        <textarea
+          id="why-input"
+          class="paste-input"
+          placeholder="e.g., This judge rejected the standard 'browsewrap' defense — we can use this in the Smith case."
+          rows="3"
+        ></textarea>
+        <div id="why-error" class="field-error" style="display:none;">Please explain why this matters before saving.</div>
+      </div>
+
+      <!-- Tags -->
+      <div class="capture-section">
+        <label class="field-label">Tags <span class="optional">(optional)</span></label>
+        <div class="tags-input-row">
+          <input type="text" id="tag-input" class="tag-input" placeholder="Add tag and press Enter" />
+        </div>
+        <div id="tags-list" class="tags-list"></div>
+      </div>
+
+      <!-- Distribution toggle -->
+      <div class="capture-section">
+        <label class="field-label">Distribution</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-mode="brain">
+            <span class="toggle-icon">&#129504;</span>
+            Save to Brain
+          </button>
+          <button class="toggle-btn" data-mode="broadcast">
+            <span class="toggle-icon">&#128225;</span>
+            Broadcast to Team
+          </button>
+        </div>
+        <p id="distribution-hint" class="distribution-hint">Files this into the Knowledge Bank for future retrieval.</p>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-row">
+        <button id="btn-clear" class="btn btn-secondary">Clear</button>
+        <button id="btn-save" class="btn btn-primary">
+          <span id="btn-save-text">Save to Brain</span>
+          <span id="btn-save-spinner" class="spinner" style="display:none;"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div id="success-state" class="success-state" style="display:none;">
+      <div class="success-icon">&#9989;</div>
+      <p class="success-title" id="success-title">Saved to Brain!</p>
+      <p class="success-desc" id="success-desc">Your finding has been filed in the Knowledge Bank.</p>
+
+      <div id="broadcast-card" class="broadcast-card" style="display:none;">
+        <label class="field-label">Share this with your team:</label>
+        <div id="broadcast-content" class="broadcast-content"></div>
+        <button id="btn-copy-broadcast" class="btn btn-secondary btn-full">
+          &#128203; Copy to Clipboard
+        </button>
+        <p id="copy-feedback" class="copy-feedback" style="display:none;">Copied!</p>
+      </div>
+
+      <button id="btn-new-capture" class="btn btn-primary btn-full">Capture Another</button>
+    </div>
+  </div>
+
+  <!-- BRAIN VIEW -->
+  <div id="view-brain" class="view">
+    <div class="brain-header">
+      <input type="text" id="brain-search" class="brain-search" placeholder="Search the Knowledge Bank..." />
+    </div>
+    <div id="brain-loading" class="brain-loading" style="display:none;">
+      <span class="spinner"></span> Loading...
+    </div>
+    <div id="brain-empty" class="empty-state" style="display:none;">
+      <div class="empty-icon">&#128218;</div>
+      <p class="empty-title">Knowledge Bank is empty</p>
+      <p class="empty-desc">Start capturing legal findings and they'll appear here.</p>
+    </div>
+    <div id="brain-list" class="brain-list"></div>
+  </div>
+
+  <!-- SETTINGS VIEW -->
+  <div id="view-settings" class="view">
+    <div class="settings-section">
+      <label class="field-label" for="sheets-url">Google Apps Script URL</label>
+      <input type="url" id="sheets-url" class="settings-input" placeholder="https://script.google.com/macros/s/.../exec" />
+      <p class="settings-hint">Paste the Web App URL from your deployed Apps Script.</p>
+    </div>
+    <div class="settings-section">
+      <label class="field-label" for="user-name">Your Name</label>
+      <input type="text" id="user-name" class="settings-input" placeholder="e.g., Jane Smith" />
+    </div>
+    <div class="settings-section">
+      <button id="btn-save-settings" class="btn btn-primary btn-full">Save Settings</button>
+      <p id="settings-feedback" class="settings-feedback" style="display:none;"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // ── State ──
+  let distributionMode = 'brain';
+  let tags = [];
+
+  // ── Elements ──
+  const views = {
+    capture: document.getElementById('view-capture'),
+    brain: document.getElementById('view-brain'),
+    settings: document.getElementById('view-settings')
+  };
+
+  const captureForm = document.getElementById('capture-form');
+  const successState = document.getElementById('success-state');
+
+  const pasteInput = document.getElementById('paste-input');
+  const pasteError = document.getElementById('paste-error');
+  const sourceUrl = document.getElementById('source-url');
+  const sourceTitleInput = document.getElementById('source-title');
+  const whyInput = document.getElementById('why-input');
+  const whyError = document.getElementById('why-error');
+  const tagInput = document.getElementById('tag-input');
+  const tagsList = document.getElementById('tags-list');
+
+  const toggleBtns = document.querySelectorAll('.toggle-btn');
+  const distributionHint = document.getElementById('distribution-hint');
+  const btnSave = document.getElementById('btn-save');
+  const btnSaveText = document.getElementById('btn-save-text');
+  const btnSaveSpinner = document.getElementById('btn-save-spinner');
+  const btnClear = document.getElementById('btn-clear');
+
+  const successTitle = document.getElementById('success-title');
+  const successDesc = document.getElementById('success-desc');
+  const broadcastCard = document.getElementById('broadcast-card');
+  const broadcastContent = document.getElementById('broadcast-content');
+  const btnCopyBroadcast = document.getElementById('btn-copy-broadcast');
+  const copyFeedback = document.getElementById('copy-feedback');
+  const btnNewCapture = document.getElementById('btn-new-capture');
+
+  const navBtns = document.querySelectorAll('.nav-btn');
+
+  const brainSearch = document.getElementById('brain-search');
+  const brainLoading = document.getElementById('brain-loading');
+  const brainEmpty = document.getElementById('brain-empty');
+  const brainList = document.getElementById('brain-list');
+
+  const sheetsUrlInput = document.getElementById('sheets-url');
+  const userNameInput = document.getElementById('user-name');
+  const btnSaveSettings = document.getElementById('btn-save-settings');
+  const settingsFeedback = document.getElementById('settings-feedback');
+
+  // ── Load settings from localStorage ──
+  loadSettings();
+
+  // ── Navigation ──
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const view = btn.dataset.view;
+      navBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      Object.values(views).forEach(v => v.classList.remove('active'));
+      views[view].classList.add('active');
+      if (view === 'brain') loadBrain();
+    });
+  });
+
+  // ── Distribution Toggle ──
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      distributionMode = btn.dataset.mode;
+
+      if (distributionMode === 'brain') {
+        distributionHint.textContent = 'Files this into the Knowledge Bank for future retrieval.';
+        btnSaveText.textContent = 'Save to Brain';
+      } else {
+        distributionHint.textContent = 'Saves to Knowledge Bank AND generates a formatted message for sharing.';
+        btnSaveText.textContent = 'Save & Prepare Broadcast';
+      }
+    });
+  });
+
+  // ── Tags ──
+  tagInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const tag = tagInput.value.trim().replace(/,/g, '');
+      if (tag && !tags.includes(tag)) {
+        tags.push(tag);
+        renderTags();
+      }
+      tagInput.value = '';
+    }
+  });
+
+  function renderTags() {
+    tagsList.innerHTML = tags.map((tag, i) =>
+      `<span class="tag-chip">${escapeHtml(tag)} <span class="tag-remove" data-index="${i}">&times;</span></span>`
+    ).join('');
+    tagsList.querySelectorAll('.tag-remove').forEach(el => {
+      el.addEventListener('click', () => {
+        tags.splice(parseInt(el.dataset.index), 1);
+        renderTags();
+      });
+    });
+  }
+
+  // ── Validation resets ──
+  pasteInput.addEventListener('input', () => {
+    pasteInput.classList.remove('error');
+    pasteError.style.display = 'none';
+  });
+  whyInput.addEventListener('input', () => {
+    whyInput.classList.remove('error');
+    whyError.style.display = 'none';
+  });
+
+  // ── Clear ──
+  btnClear.addEventListener('click', () => {
+    pasteInput.value = '';
+    sourceUrl.value = '';
+    sourceTitleInput.value = '';
+    whyInput.value = '';
+    tags = [];
+    renderTags();
+    pasteInput.classList.remove('error');
+    pasteError.style.display = 'none';
+    whyInput.classList.remove('error');
+    whyError.style.display = 'none';
+  });
+
+  // ── Save ──
+  btnSave.addEventListener('click', async () => {
+    // Validate
+    let valid = true;
+    const text = pasteInput.value.trim();
+    const why = whyInput.value.trim();
+
+    if (!text) {
+      pasteInput.classList.add('error');
+      pasteError.style.display = 'block';
+      valid = false;
+    }
+    if (!why) {
+      whyInput.classList.add('error');
+      whyError.style.display = 'block';
+      valid = false;
+    }
+    if (!valid) return;
+
+    const settings = getSettingsData();
+    if (!settings.sheetsUrl) {
+      switchToView('settings');
+      showSettingsFeedback('Please configure your Google Apps Script URL first.', 'error');
+      return;
+    }
+
+    // Disable button, show spinner
+    btnSave.disabled = true;
+    btnSaveText.style.display = 'none';
+    btnSaveSpinner.style.display = 'inline-block';
+
+    const record = {
+      text: text,
+      url: sourceUrl.value.trim(),
+      pageTitle: sourceTitleInput.value.trim(),
+      source: sourceTitleInput.value.trim() || 'Pasted',
+      why: why,
+      tags: tags.join(', '),
+      user: settings.userName || 'Unknown',
+      timestamp: new Date().toISOString(),
+      mode: distributionMode
+    };
+
+    try {
+      const url = new URL(settings.sheetsUrl);
+      url.searchParams.set('action', 'save');
+      url.searchParams.set('text', record.text.substring(0, 1500));
+      url.searchParams.set('url', record.url);
+      url.searchParams.set('pageTitle', record.pageTitle);
+      url.searchParams.set('source', record.source);
+      url.searchParams.set('why', record.why);
+      url.searchParams.set('tags', record.tags);
+      url.searchParams.set('user', record.user);
+      url.searchParams.set('timestamp', record.timestamp);
+      url.searchParams.set('mode', record.mode);
+
+      const resp = await fetch(url.toString(), { mode: 'no-cors' });
+      // no-cors means we can't read the response, but the request goes through
+      showSuccess(record);
+    } catch (err) {
+      console.error('Failed to save:', err);
+      // Save locally as fallback
+      saveLocally(record);
+      showSuccess(record);
+    } finally {
+      btnSave.disabled = false;
+      btnSaveText.style.display = 'inline';
+      btnSaveSpinner.style.display = 'none';
+    }
+  });
+
+  function showSuccess(record) {
+    captureForm.style.display = 'none';
+    successState.style.display = 'block';
+
+    if (distributionMode === 'broadcast') {
+      successTitle.textContent = 'Saved & Ready to Share!';
+      successDesc.textContent = 'Copy the message below and paste it in Slack, email, or Jira.';
+      broadcastCard.style.display = 'block';
+      broadcastContent.textContent = formatBroadcast(record);
+    } else {
+      successTitle.textContent = 'Saved to Brain!';
+      successDesc.textContent = 'Your finding has been filed in the Knowledge Bank.';
+      broadcastCard.style.display = 'none';
+    }
+  }
+
+  function formatBroadcast(record) {
+    const divider = '---';
+    let msg = `** Legal Update **\n`;
+    msg += `${divider}\n`;
+    if (record.source) msg += `Source: ${record.source}`;
+    if (record.pageTitle && record.pageTitle !== record.source) msg += ` | ${record.pageTitle}`;
+    msg += '\n';
+    if (record.url) msg += `Link: ${record.url}\n`;
+    msg += `\nKey Excerpt:\n"${record.text}"\n\n`;
+    msg += `Why This Matters:\n${record.why}\n`;
+    if (record.tags) msg += `\nTags: ${record.tags}\n`;
+    msg += `${divider}\n`;
+    msg += `Captured by ${record.user} on ${new Date(record.timestamp).toLocaleDateString()}`;
+    return msg;
+  }
+
+  // ── Copy Broadcast ──
+  btnCopyBroadcast.addEventListener('click', async () => {
+    const text = broadcastContent.textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+    copyFeedback.style.display = 'block';
+    setTimeout(() => { copyFeedback.style.display = 'none'; }, 2000);
+  });
+
+  // ── New Capture ──
+  btnNewCapture.addEventListener('click', () => {
+    captureForm.style.display = 'block';
+    successState.style.display = 'none';
+    pasteInput.value = '';
+    sourceUrl.value = '';
+    sourceTitleInput.value = '';
+    whyInput.value = '';
+    tags = [];
+    renderTags();
+  });
+
+  // ── Brain (Knowledge Bank) ──
+  async function loadBrain() {
+    const settings = getSettingsData();
+    if (!settings.sheetsUrl) {
+      brainEmpty.style.display = 'block';
+      brainList.innerHTML = '';
+      return;
+    }
+
+    brainLoading.style.display = 'block';
+    brainEmpty.style.display = 'none';
+    brainList.innerHTML = '';
+
+    try {
+      const url = new URL(settings.sheetsUrl);
+      url.searchParams.set('action', 'read');
+      const query = brainSearch.value.trim();
+      if (query) url.searchParams.set('search', query);
+
+      const resp = await fetch(url.toString());
+      const data = await resp.json();
+      brainLoading.style.display = 'none';
+
+      if (data && data.records && data.records.length > 0) {
+        renderBrainItems(data.records);
+      } else {
+        const localRecords = getLocalRecords();
+        if (localRecords.length === 0) {
+          brainEmpty.style.display = 'block';
+        } else {
+          renderBrainItems(localRecords);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load brain:', err);
+      brainLoading.style.display = 'none';
+
+      const localRecords = getLocalRecords();
+      if (localRecords.length === 0) {
+        brainEmpty.style.display = 'block';
+      } else {
+        renderBrainItems(localRecords);
+      }
+    }
+  }
+
+  function renderBrainItems(records) {
+    const query = brainSearch.value.trim().toLowerCase();
+    const filtered = query
+      ? records.filter(r =>
+          (r.why || '').toLowerCase().includes(query) ||
+          (r.text || '').toLowerCase().includes(query) ||
+          (r.tags || '').toLowerCase().includes(query) ||
+          (r.source || '').toLowerCase().includes(query)
+        )
+      : records;
+
+    if (filtered.length === 0) {
+      brainEmpty.style.display = 'block';
+      brainList.innerHTML = '';
+      return;
+    }
+
+    brainEmpty.style.display = 'none';
+    brainList.innerHTML = filtered.map(r => {
+      const date = r.timestamp ? new Date(r.timestamp).toLocaleDateString() : '';
+      const tagsHtml = (r.tags || '').split(',').filter(t => t.trim()).map(t =>
+        `<span class="brain-item-tag">${escapeHtml(t.trim())}</span>`
+      ).join('');
+
+      return `
+        <div class="brain-item">
+          <div class="brain-item-header">
+            <span class="brain-item-source">${escapeHtml(r.source || 'Pasted')}</span>
+            <span class="brain-item-date">${date}</span>
+          </div>
+          <div class="brain-item-why">${escapeHtml(r.why || '')}</div>
+          <div class="brain-item-text">${escapeHtml(r.text || '')}</div>
+          ${tagsHtml ? `<div class="brain-item-tags">${tagsHtml}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Debounced search
+  let searchTimeout;
+  brainSearch.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(loadBrain, 300);
+  });
+
+  // ── Settings ──
+  function loadSettings() {
+    const settings = getSettingsData();
+    sheetsUrlInput.value = settings.sheetsUrl || '';
+    userNameInput.value = settings.userName || '';
+  }
+
+  function getSettingsData() {
+    return {
+      sheetsUrl: localStorage.getItem('lc_sheetsUrl') || '',
+      userName: localStorage.getItem('lc_userName') || ''
+    };
+  }
+
+  btnSaveSettings.addEventListener('click', () => {
+    localStorage.setItem('lc_sheetsUrl', sheetsUrlInput.value.trim());
+    localStorage.setItem('lc_userName', userNameInput.value.trim());
+    showSettingsFeedback('Settings saved!', 'success');
+  });
+
+  function showSettingsFeedback(msg, type) {
+    settingsFeedback.textContent = msg;
+    settingsFeedback.className = `settings-feedback ${type}`;
+    settingsFeedback.style.display = 'block';
+    setTimeout(() => { settingsFeedback.style.display = 'none'; }, 3000);
+  }
+
+  // ── Local Storage Fallback ──
+  function saveLocally(record) {
+    const records = getLocalRecords();
+    records.unshift(record);
+    if (records.length > 200) records.length = 200;
+    localStorage.setItem('lc_localRecords', JSON.stringify(records));
+  }
+
+  function getLocalRecords() {
+    try {
+      return JSON.parse(localStorage.getItem('lc_localRecords') || '[]');
+    } catch { return []; }
+  }
+
+  // ── Helpers ──
+  function switchToView(viewName) {
+    navBtns.forEach(b => b.classList.toggle('active', b.dataset.view === viewName));
+    Object.entries(views).forEach(([name, el]) => {
+      el.classList.toggle('active', name === viewName);
+    });
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+});
+</script>
+</body>
+</html>
