@@ -1217,11 +1217,7 @@
     msg += `Why it matters: ${whyClean}.\n\n`;
     msg += `Here is a key quote from the source:\n`;
 
-    let quote = record.text;
-    if (quote.length > 400) {
-      quote = quote.substring(0, 397).replace(/\s+\S*$/, '') + '...';
-    }
-    msg += `> \u201C${quote}\u201D\n\n`;
+    msg += `> \u201C${record.text}\u201D\n\n`;
 
     if (record.citation) msg += `Citation: ${record.citation}\n`;
     if (record.url) msg += `Read more: ${record.url}\n`;
@@ -1302,12 +1298,8 @@
       items.forEach(r => {
         const source = r.pageTitle || r.source || 'Unknown source';
         const why = r.why || '';
-        let quote = r.text || '';
-        if (quote.length > 300) {
-          quote = quote.substring(0, 297).replace(/\s+\S*$/, '') + '...';
-        }
         s += `\u2022 ${source} \u2014 ${why}\n`;
-        s += `  Key quote: \u201C${quote}\u201D\n`;
+        s += `  Key quote: \u201C${r.text || ''}\u201D\n`;
         if (r.citation) s += `  Citation: ${r.citation}\n`;
         if (r.url) s += `  Link: ${r.url}\n`;
         s += '\n';

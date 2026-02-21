@@ -640,11 +640,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     msg += `Why it matters: ${whyClean}.\n\n`;
     msg += `Here is a key quote from the source:\n`;
 
-    let quote = record.text;
-    if (quote.length > 400) {
-      quote = quote.substring(0, 397).replace(/\s+\S*$/, '') + '...';
-    }
-    msg += `> "${quote}"\n\n`;
+    msg += `> "${record.text}"\n\n`;
 
     if (record.citation) msg += `Citation: ${record.citation}\n`;
     if (record.url) msg += `Read more: ${record.url}\n`;
@@ -1061,12 +1057,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       items.forEach(r => {
         const source = r.pageTitle || r.source || 'Unknown source';
         const why = r.why || '';
-        let quote = r.text || '';
-        if (quote.length > 300) {
-          quote = quote.substring(0, 297).replace(/\s+\S*$/, '') + '...';
-        }
         s += `• ${source} — ${why}\n`;
-        s += `  Key quote: "${quote}"\n`;
+        s += `  Key quote: "${r.text || ''}"\n`;
         if (r.url) s += `  Link: ${r.url}\n`;
         s += '\n';
       });
