@@ -1211,10 +1211,10 @@
   function formatBroadcast(record) {
     const title = record.pageTitle || record.source || 'something interesting';
 
-    let msg = `📌 *${title}*\n\n`;
-    msg += `💡 *Why it matters:* ${record.why}\n\n`;
-    msg += `📖 *Key Quote:*\n"${record.text}"\n\n`;
-    if (record.citation) msg += `📎 *Citation:* ${record.citation}\n`;
+    let msg = `📌 ${title}\n\n`;
+    msg += `💡 Why it matters: ${record.why}\n\n`;
+    msg += `📖 Key Quote:\n"${record.text}"\n\n`;
+    if (record.citation) msg += `📎 Citation: ${record.citation}\n`;
     if (record.url) msg += `🔗 ${record.url}\n`;
     if (record.tags) msg += `\n#${record.tags.split(',').map(t => t.trim()).join(' #')}`;
     return msg;

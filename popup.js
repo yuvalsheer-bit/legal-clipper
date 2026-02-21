@@ -634,10 +634,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   function formatBroadcast(record) {
     const title = record.pageTitle || record.source || 'something interesting';
 
-    let msg = `\uD83D\uDCCC *${title}*\n\n`;
-    msg += `\uD83D\uDCA1 *Why it matters:* ${record.why}\n\n`;
-    msg += `\uD83D\uDCD6 *Key Quote:*\n"${record.text}"\n\n`;
-    if (record.citation) msg += `\uD83D\uDCCE *Citation:* ${record.citation}\n`;
+    let msg = `\uD83D\uDCCC ${title}\n\n`;
+    msg += `\uD83D\uDCA1 Why it matters: ${record.why}\n\n`;
+    msg += `\uD83D\uDCD6 Key Quote:\n"${record.text}"\n\n`;
+    if (record.citation) msg += `\uD83D\uDCCE Citation: ${record.citation}\n`;
     if (record.url) msg += `\uD83D\uDD17 ${record.url}\n`;
     if (record.tags) msg += `\n#${record.tags.split(',').map(t => t.trim()).join(' #')}`;
     return msg;
