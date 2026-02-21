@@ -164,7 +164,8 @@ async function supabaseInsert(record) {
       tags: record.tags || '',
       cause_of_action: record.causeOfAction || '',
       case_name: record.caseName || '',
-      rating: record.rating || ''
+      rating: record.rating || '',
+      citation: record.citation || ''
     })
   });
 
@@ -206,7 +207,8 @@ async function supabaseFetchAll() {
     tags: row.tags || '',
     causeOfAction: row.cause_of_action || '',
     caseName: row.case_name || '',
-    rating: row.rating || ''
+    rating: row.rating || '',
+    citation: row.citation || ''
   }));
 
   return { success: true, records: records };

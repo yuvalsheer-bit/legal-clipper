@@ -266,6 +266,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       capturedText.textContent = data.text;
     }
 
+    // Show character count warning for long text
+    const textLen = (data.text || '').length;
+    const lengthWarning = document.getElementById('text-length-warning');
+    if (lengthWarning) {
+      if (textLen > 5000) {
+        lengthWarning.textContent = `${textLen.toLocaleString()} characters — text will be truncated to 5,000 characters on save.`;
+        lengthWarning.className = 'text-length-warning over';
+        lengthWarning.style.display = 'block';
+      } else if (textLen > 3000) {
+        lengthWarning.textContent = `${textLen.toLocaleString()} characters — approaching the 5,000 character limit.`;
+        lengthWarning.className = 'text-length-warning warn';
+        lengthWarning.style.display = 'block';
+      } else {
+        lengthWarning.style.display = 'none';
+      }
+    }
+
     whyInput.value = '';
     whyInput.classList.remove('error');
     whyError.style.display = 'none';
@@ -294,6 +311,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (coaSelect) {
       coaSelect.value = sessionDefaultCoa || '';
     }
+
+    // Reset citation
+    const citationInput = document.getElementById('citation-input');
+    if (citationInput) citationInput.value = '';
 
     whyInput.focus();
   }
@@ -556,10 +577,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnSaveSpinner.style.display = 'inline-block';
 
     const coaSelect = document.getElementById('coa-select');
+    const citationInput = document.getElementById('citation-input');
     const caseName = captureCaseSelect.value === '__add_new__' ? '' : (captureCaseSelect.value || '');
+
+    // Truncate text if over 5000 characters
+    let savedText = capturedData.text || '';
+    let savedHtml = capturedData.html || '';
+    if (savedText.length > 5000) {
+      savedText = savedText.substring(0, 5000);
+      savedHtml = ''; // HTML can't be reliably truncated, fall back to plain text
+    }
+
     const record = {
-      text: capturedData.text,
-      html: capturedData.html || '',
+      text: savedText,
+      html: savedHtml,
       url: capturedData.url,
       pageTitle: capturedData.title,
       source: capturedData.source,
@@ -569,7 +600,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       timestamp: capturedData.timestamp || new Date().toISOString(),
       causeOfAction: coaSelect ? coaSelect.value : '',
       caseName: caseName,
-      rating: captureRating
+      rating: captureRating,
+      citation: citationInput ? citationInput.value.trim() : ''
     };
 
     // Auto-set session defaults so next clip keeps the same case + COA
@@ -610,6 +642,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     msg += `> "${quote}"\n\n`;
 
+    if (record.citation) msg += `Citation: ${record.citation}\n`;
     if (record.url) msg += `Read more: ${record.url}\n`;
     if (record.tags) msg += `\n#${record.tags.split(',').map(t => t.trim()).join(' #')}`;
     return msg;
@@ -1075,7 +1108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (records.length === 0) return;
 
-    const headers = ['Timestamp', 'User', 'Source', 'Page Title', 'URL', 'Captured Text', 'Why It Matters', 'Tags', 'Cause of Action', 'Case Name', 'Rating'];
+    const headers = ['Timestamp', 'User', 'Source', 'Page Title', 'URL', 'Captured Text', 'Why It Matters', 'Tags', 'Cause of Action', 'Case Name', 'Rating', 'Citation'];
     const rows = records.map(r => [
       r.timestamp || '',
       r.user || '',
@@ -1087,7 +1120,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       r.tags || '',
       r.causeOfAction || '',
       r.caseName || '',
-      r.rating || ''
+      r.rating || '',
+      r.citation || ''
     ]);
 
     const csvContent = [headers, ...rows]

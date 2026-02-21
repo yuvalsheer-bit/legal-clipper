@@ -325,6 +325,16 @@
   }
   .clip-text-toggle.visible { display: inline-block; }
 
+  .clip-citation {
+    font-size: 12px;
+    color: #4b5563;
+    font-style: italic;
+    margin-top: 6px;
+    padding: 4px 8px;
+    background: #f0f4ff;
+    border-left: 3px solid #6366f1;
+    border-radius: 2px;
+  }
   .clip-tags {
     display: flex;
     flex-wrap: wrap;
@@ -818,7 +828,8 @@
       tags: row.tags || '',
       causeOfAction: row.cause_of_action || '',
       caseName: row.case_name || '',
-      rating: row.rating || ''
+      rating: row.rating || '',
+      citation: row.citation || ''
     };
   }
 
@@ -909,7 +920,7 @@
       if (user && r.user !== user) return false;
 
       if (q) {
-        const searchable = [r.why, r.text, r.tags, r.source, r.pageTitle, r.causeOfAction, r.caseName, r.user].join(' ').toLowerCase();
+        const searchable = [r.why, r.text, r.tags, r.source, r.pageTitle, r.causeOfAction, r.caseName, r.user, r.citation].join(' ').toLowerCase();
         if (!searchable.includes(q)) return false;
       }
 
@@ -964,6 +975,7 @@
       caseOptions += '<option value="__add_new__">\u2795 Add new...</option>';
 
       const urlLink = r.url ? `<a href="${escapeHtml(r.url)}" target="_blank" rel="noopener" class="clip-link">&#128279; View Source</a>` : '';
+      const citationHtml = r.citation ? `<div class="clip-citation">&#128213; ${escapeHtml(r.citation)}</div>` : '';
 
       return `
         <div class="clip-card">
@@ -978,6 +990,7 @@
           <div class="clip-why">${escapeHtml(r.why || '')}</div>
           <div class="clip-text" data-idx="${i}">${textPreview}</div>
           ${needsToggle ? `<span class="clip-text-toggle visible" data-idx="${i}">Show more</span>` : ''}
+          ${citationHtml}
           ${tagsHtml ? `<div class="clip-tags">${tagsHtml}</div>` : ''}
           <div class="clip-controls">
             <select class="clip-case-select" data-idx="${i}">${caseOptions}</select>
@@ -1196,11 +1209,11 @@
     const data = filteredRecords.length > 0 ? filteredRecords : allRecords;
     if (data.length === 0) return;
 
-    const headers = ['Timestamp', 'User', 'Source', 'Page Title', 'URL', 'Captured Text', 'Why It Matters', 'Tags', 'Cause of Action', 'Case Name', 'Rating'];
+    const headers = ['Timestamp', 'User', 'Source', 'Page Title', 'URL', 'Captured Text', 'Why It Matters', 'Tags', 'Cause of Action', 'Case Name', 'Rating', 'Citation'];
     const rows = data.map(r => [
       r.timestamp || '', r.user || '', r.source || '', r.pageTitle || '',
       r.url || '', r.text || '', r.why || '', r.tags || '',
-      r.causeOfAction || '', r.caseName || '', r.rating || ''
+      r.causeOfAction || '', r.caseName || '', r.rating || '', r.citation || ''
     ]);
 
     const csvContent = [headers, ...rows]
@@ -1257,6 +1270,7 @@
         }
         s += `\u2022 ${source} \u2014 ${why}\n`;
         s += `  Key quote: \u201C${quote}\u201D\n`;
+        if (r.citation) s += `  Citation: ${r.citation}\n`;
         if (r.url) s += `  Link: ${r.url}\n`;
         s += '\n';
       });

@@ -315,6 +315,23 @@ body {
   text-decoration: underline;
 }
 
+.text-length-warning {
+  font-size: 11px;
+  margin-top: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.text-length-warning.warn {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.text-length-warning.over {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
 /* ── Why Input ── */
 .why-container {
   margin-bottom: 14px;

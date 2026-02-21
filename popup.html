@@ -101,6 +101,7 @@
       <div class="captured-text-container">
         <label class="field-label">Captured Text</label>
         <div id="captured-text" class="captured-text"></div>
+        <div id="text-length-warning" class="text-length-warning" style="display: none;"></div>
       </div>
 
       <!-- Why is this crucial? -->
@@ -158,6 +159,12 @@
           <button type="button" class="capture-rating-btn" data-rating="Negative" title="Negative">&#9888;&#65039; Negative</button>
           <button type="button" class="capture-rating-btn" data-rating="Neutral" title="Neutral">&#10134; Neutral</button>
         </div>
+      </div>
+
+      <!-- Citation -->
+      <div class="coa-container">
+        <label class="field-label" for="citation-input">Citation <span class="optional">(optional)</span></label>
+        <input type="text" id="citation-input" class="why-input" placeholder="e.g., Smith v. Jones, 123 F.3d 456 (9th Cir. 2024)" style="height: auto; min-height: 0; padding: 8px 10px; resize: none;" />
       </div>
 
       <!-- Action buttons -->
