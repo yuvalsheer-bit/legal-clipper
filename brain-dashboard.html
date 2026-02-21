@@ -1285,28 +1285,30 @@
     const neutral = caseRecords.filter(r => r.rating === 'Neutral');
     const unrated = caseRecords.filter(r => !r.rating);
 
-    let report = `\u{1F4CB} CASE: ${caseName}\n\n`;
+    let report = `📋 Case Report: ${caseName}\n`;
+    report += `📅 Generated: ${new Date().toLocaleDateString()}\n`;
+    report += `📊 ${caseRecords.length} clip${caseRecords.length !== 1 ? 's' : ''} total\n\n`;
 
     function formatSection(title, emoji, items) {
       if (items.length === 0) return '';
-      let s = `${emoji} ${title}\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n`;
-      items.forEach(r => {
+      let s = `${emoji} ${title} (${items.length})\n\n`;
+      items.forEach((r, i) => {
         const source = r.pageTitle || r.source || 'Unknown source';
-        const why = r.why || '';
-        s += `\u2022 ${source} \u2014 ${why}\n`;
-        s += `  Key quote: \u201C${r.text || ''}\u201D\n`;
-        if (r.citation) s += `  Citation: ${r.citation}\n`;
-        if (r.url) s += `  Link: ${r.url}\n`;
+        s += `  ${i + 1}. 📌 ${source}\n`;
+        s += `     💡 Why it matters: ${r.why || ''}\n`;
+        s += `     📖 Key Quote:\n     "${r.text || ''}"\n`;
+        if (r.citation) s += `     📎 Citation: ${r.citation}\n`;
+        if (r.url) s += `     🔗 ${r.url}\n`;
         s += '\n';
       });
       return s;
     }
 
-    report += formatSection('HELPFUL', '\u2705', helpful);
-    report += formatSection('NEGATIVE', '\u26A0\uFE0F', negative);
-    report += formatSection('NEUTRAL', '\u2796', neutral);
+    report += formatSection('HELPFUL', '✅', helpful);
+    report += formatSection('NEGATIVE', '⚠️', negative);
+    report += formatSection('NEUTRAL', '➖', neutral);
     if (unrated.length > 0) {
-      report += formatSection('UNRATED', '\u{1F4CC}', unrated);
+      report += formatSection('UNRATED', '📂', unrated);
     }
 
     reportText.textContent = report;

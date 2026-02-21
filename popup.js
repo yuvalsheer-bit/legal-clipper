@@ -1044,17 +1044,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const neutral = caseRecords.filter(r => r.rating === 'Neutral');
     const unrated = caseRecords.filter(r => !r.rating);
 
-    let report = `📋 CASE: ${caseName}\n\n`;
+    let report = `📋 Case Report: ${caseName}\n`;
+    report += `📅 Generated: ${new Date().toLocaleDateString()}\n`;
+    report += `📊 ${caseRecords.length} clip${caseRecords.length !== 1 ? 's' : ''} total\n\n`;
 
     function formatSection(title, emoji, items) {
       if (items.length === 0) return '';
-      let s = `${emoji} ${title}\n─────────\n`;
-      items.forEach(r => {
+      let s = `${emoji} ${title} (${items.length})\n\n`;
+      items.forEach((r, i) => {
         const source = r.pageTitle || r.source || 'Unknown source';
-        const why = r.why || '';
-        s += `• ${source} — ${why}\n`;
-        s += `  Key quote: "${r.text || ''}"\n`;
-        if (r.url) s += `  Link: ${r.url}\n`;
+        s += `  ${i + 1}. 📌 ${source}\n`;
+        s += `     💡 Why it matters: ${r.why || ''}\n`;
+        s += `     📖 Key Quote:\n     "${r.text || ''}"\n`;
+        if (r.citation) s += `     📎 Citation: ${r.citation}\n`;
+        if (r.url) s += `     🔗 ${r.url}\n`;
         s += '\n';
       });
       return s;
@@ -1064,7 +1067,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     report += formatSection('NEGATIVE', '⚠️', negative);
     report += formatSection('NEUTRAL', '➖', neutral);
     if (unrated.length > 0) {
-      report += formatSection('UNRATED', '📌', unrated);
+      report += formatSection('UNRATED', '📂', unrated);
     }
 
     caseReportText.textContent = report;
