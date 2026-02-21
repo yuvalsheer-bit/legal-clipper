@@ -221,6 +221,7 @@ async function supabaseUpdate(id, updates) {
   const patch = {};
   if (updates.caseName !== undefined) patch.case_name = updates.caseName;
   if (updates.rating !== undefined) patch.rating = updates.rating;
+  if (updates.citation !== undefined) patch.citation = updates.citation;
 
   const response = await fetch(`${SUPABASE_URL}/rest/v1/clips?id=eq.${id}`, {
     method: 'PATCH',

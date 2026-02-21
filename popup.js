@@ -153,12 +153,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ── Draft Persistence ──
   // Saves in-progress work so it survives popup close/reopen
   function saveDraft() {
+    const citationInput = document.getElementById('citation-input');
     const draft = {
       capturedData: capturedData,
       manualText: manualText ? manualText.value : '',
       manualSource: manualSource ? manualSource.value : '',
       manualUrl: manualUrl ? manualUrl.value : '',
       why: whyInput ? whyInput.value : '',
+      citation: citationInput ? citationInput.value : '',
       // Track which screen was showing
       screen: manualForm.style.display === 'block' ? 'manual'
             : captureForm.style.display === 'block' ? 'capture'
@@ -200,6 +202,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       capturedText.textContent = capturedData.text || '';
 
       whyInput.value = d.why || '';
+      const citationInput = document.getElementById('citation-input');
+      if (citationInput) citationInput.value = d.citation || '';
       return true;
     }
 
@@ -674,6 +678,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     whyError.style.display = 'none';
     saveDraft();
   });
+
+  // ── Citation auto-save draft ──
+  const citationDraftInput = document.getElementById('citation-input');
+  if (citationDraftInput) {
+    citationDraftInput.addEventListener('input', () => { saveDraft(); });
+  }
 
   // ── Cached case names (loaded once per Brain open) ──
   let knownCaseNames = [];
