@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Legal Clipper — Brain Dashboard</title>
+<title>The Hive — Brain Dashboard</title>
 <style>
   /* ── Reset & Base ── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -613,7 +613,7 @@
   <div class="lock-card">
     <div class="lock-icon">&#128218;</div>
     <div class="lock-title">Brain Dashboard</div>
-    <div class="lock-subtitle">Legal Clipper — Knowledge Bank</div>
+    <div class="lock-subtitle">The Hive — Knowledge Bank</div>
     <div id="setup-section" style="display: none;">
       <p style="font-size: 13px; color: #374151; margin-bottom: 16px;">First time here? Set a team password.</p>
       <input type="password" id="setup-input" class="lock-input" placeholder="Choose a team password" />
@@ -637,7 +637,7 @@
     <div class="dash-header-top">
       <div class="dash-brand">
         <span class="dash-brand-icon">&#128218;</span>
-        <span class="dash-brand-text">Brain Dashboard <span class="dash-brand-sub">Legal Clipper</span></span>
+        <span class="dash-brand-text">Brain Dashboard <span class="dash-brand-sub">The Hive</span></span>
       </div>
       <div class="dash-actions">
         <button class="dash-btn" id="btn-refresh">&#128260; Refresh</button>
@@ -1211,7 +1211,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `legal-clipper-export-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `the-hive-export-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   });

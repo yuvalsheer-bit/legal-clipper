@@ -1,4 +1,4 @@
-// Legal Clipper - Content Script
+// The Hive - Content Script
 // Detects text selection and shows a floating "Capture" button
 
 let captureButton = null;
@@ -7,7 +7,7 @@ function createCaptureButton() {
   if (captureButton) return;
 
   captureButton = document.createElement('div');
-  captureButton.id = 'legal-clipper-capture-btn';
+  captureButton.id = 'the-hive-capture-btn';
   captureButton.textContent = 'Capture';
   captureButton.style.display = 'none';
   document.body.appendChild(captureButton);
@@ -89,7 +89,7 @@ function hideCaptureButton() {
 // Listen for text selection
 document.addEventListener('mouseup', (e) => {
   // Ignore clicks on the capture button itself
-  if (e.target.id === 'legal-clipper-capture-btn') return;
+  if (e.target.id === 'the-hive-capture-btn') return;
 
   setTimeout(() => {
     const selection = window.getSelection();
@@ -107,7 +107,7 @@ document.addEventListener('mouseup', (e) => {
 
 // Hide button when clicking elsewhere
 document.addEventListener('mousedown', (e) => {
-  if (e.target.id !== 'legal-clipper-capture-btn') {
+  if (e.target.id !== 'the-hive-capture-btn') {
     hideCaptureButton();
   }
 });

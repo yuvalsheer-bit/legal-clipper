@@ -1,4 +1,4 @@
-// Legal Clipper - Popup Logic (Synced to Supabase)
+// The Hive - Popup Logic (Synced to Supabase)
 
 document.addEventListener('DOMContentLoaded', async () => {
   // ── State ──
@@ -573,13 +573,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // Auto-set session defaults so next clip keeps the same case + COA
-    if (caseName) {
-      sessionDefaultCase = caseName;
-    }
-    const coa = coaSelect ? coaSelect.value : '';
-    if (coa) {
-      sessionDefaultCoa = coa;
-    }
+    sessionDefaultCase = caseName || '';
+    sessionDefaultCoa = coaSelect ? coaSelect.value : '';
     // Persist to storage so defaults survive popup close/reopen
     chrome.storage.local.set({ sessionDefaultCase, sessionDefaultCoa });
 
@@ -1103,7 +1098,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `legal-clipper-export-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `the-hive-export-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   });

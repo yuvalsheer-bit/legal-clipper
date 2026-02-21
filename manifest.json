@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Legal Clipper",
+  "name": "The Hive",
   "version": "1.0.0",
   "description": "Capture legal research findings, add analysis, and save or broadcast to your team.",
   "permissions": [
@@ -41,7 +41,7 @@
         "default": "Ctrl+Shift+L",
         "mac": "Command+Shift+L"
       },
-      "description": "Capture selected text for Legal Clipper"
+      "description": "Capture selected text for The Hive"
     }
   }
 }

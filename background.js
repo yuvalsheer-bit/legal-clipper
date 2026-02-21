@@ -1,4 +1,4 @@
-// Legal Clipper - Background Service Worker (Supabase)
+// The Hive - Background Service Worker (Supabase)
 
 const SUPABASE_URL = 'https://enptpydsfxmigfodrjbb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_L3XRLx45c6FLdRQG7oGLeg_faLqqPEU';
@@ -9,14 +9,14 @@ let pendingCapture = null;
 // Right-click context menu
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: 'legal-clipper-capture',
-    title: 'Capture for Legal Clipper',
+    id: 'the-hive-capture',
+    title: 'Capture for The Hive',
     contexts: ['selection']
   });
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === 'legal-clipper-capture' && info.selectionText) {
+  if (info.menuItemId === 'the-hive-capture' && info.selectionText) {
     pendingCapture = {
       text: info.selectionText.trim(),
       url: tab.url,

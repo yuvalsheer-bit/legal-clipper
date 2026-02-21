@@ -1,6 +1,6 @@
-/* Legal Clipper - Capture Button Styles */
+/* The Hive - Capture Button Styles */
 
-#legal-clipper-capture-btn {
+#the-hive-capture-btn {
   position: absolute;
   z-index: 2147483647;
   display: none;
@@ -21,18 +21,18 @@
   line-height: 1;
 }
 
-#legal-clipper-capture-btn:hover {
+#the-hive-capture-btn:hover {
   background: #1e40af;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 
-#legal-clipper-capture-btn:active {
+#the-hive-capture-btn:active {
   background: #1e3a8a;
   transform: translateY(0);
 }
 
-#legal-clipper-capture-btn::before {
+#the-hive-capture-btn::before {
   content: '\2702';
   margin-right: 5px;
   font-size: 14px;
