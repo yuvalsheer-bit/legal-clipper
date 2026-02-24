@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       coaSelect.value = sessionDefaultCoa || '';
     }
 
-    // Pre-fill citation from content script (Westlaw auto-detect) or reset
+    // Pre-fill citation (from two-step clipboard capture or empty)
     const citationInput = document.getElementById('citation-input');
     if (citationInput) citationInput.value = data.citation || '';
 

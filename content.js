@@ -1,7 +1,10 @@
 // The Hive - Content Script
 // Detects text selection and shows a floating "Capture" button
+// Supports two-step capture: Quote first, then Citation (from clipboard)
 
 let captureButton = null;
+let citationButton = null;
+let pendingQuote = null; // Stores captured quote while waiting for citation
 
 function createCaptureButton() {
   if (captureButton) return;
@@ -29,22 +32,95 @@ function createCaptureButton() {
       selectedHtml = container.innerHTML;
     } catch (err) {}
 
-    // Send the captured data to the extension popup
+    const capturedData = {
+      text: selectedText,
+      html: selectedHtml,
+      url: window.location.href,
+      title: document.title,
+      timestamp: new Date().toISOString(),
+      source: detectSource(window.location.hostname),
+      citation: ''
+    };
+
+    // Store as pending quote and show "Paste Citation" button
+    pendingQuote = capturedData;
+    hideCaptureButton();
+    showCitationButton();
+  });
+}
+
+function createCitationButton() {
+  if (citationButton) return;
+
+  citationButton = document.createElement('div');
+  citationButton.id = 'the-hive-citation-btn';
+  citationButton.style.display = 'none';
+  document.body.appendChild(citationButton);
+
+  // "Paste Citation" — reads clipboard and sends both quote + citation
+  citationButton.addEventListener('mousedown', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!pendingQuote) return;
+
+    try {
+      const clipboardText = await navigator.clipboard.readText();
+      if (clipboardText && clipboardText.trim()) {
+        pendingQuote.citation = clipboardText.trim();
+      }
+    } catch (err) {
+      // Clipboard read failed (permissions) — send without citation
+    }
+
+    // Send the captured data with citation to the extension
     chrome.runtime.sendMessage({
       type: 'TEXT_CAPTURED',
-      data: {
-        text: selectedText,
-        html: selectedHtml,
-        url: window.location.href,
-        title: document.title,
-        timestamp: new Date().toISOString(),
-        source: detectSource(window.location.hostname),
-        citation: detectCitation(window.location.hostname)
-      }
+      data: pendingQuote
     });
 
-    hideCaptureButton();
+    pendingQuote = null;
+    hideCitationButton();
   });
+}
+
+function showCitationButton() {
+  if (!citationButton) createCitationButton();
+
+  // Position fixed at top-center of viewport
+  citationButton.style.display = 'flex';
+
+  // Auto-dismiss after 30 seconds
+  clearTimeout(citationButton._timeout);
+  citationButton._timeout = setTimeout(() => {
+    if (pendingQuote) {
+      // Send without citation after timeout
+      chrome.runtime.sendMessage({
+        type: 'TEXT_CAPTURED',
+        data: pendingQuote
+      });
+      pendingQuote = null;
+    }
+    hideCitationButton();
+  }, 30000);
+}
+
+function hideCitationButton() {
+  if (citationButton) {
+    citationButton.style.display = 'none';
+    clearTimeout(citationButton._timeout);
+  }
+}
+
+// "Skip" — send quote without citation
+function skipCitation() {
+  if (!pendingQuote) return;
+  chrome.runtime.sendMessage({
+    type: 'TEXT_CAPTURED',
+    data: pendingQuote
+  });
+  pendingQuote = null;
+  hideCitationButton();
 }
 
 function detectSource(hostname) {
@@ -55,63 +131,6 @@ function detectSource(hostname) {
   if (hostname.includes('scholar.google')) return 'Google Scholar';
   if (hostname.includes('law.justia')) return 'Justia';
   return hostname;
-}
-
-function detectCitation(hostname) {
-  // Auto-detect citation from Westlaw pages
-  if (hostname.includes('westlaw')) {
-    // Try common Westlaw DOM selectors for citation
-    const selectors = [
-      '#co_docHeaderContainer .co_title',
-      '.document-title .citation',
-      '[data-testid="document-title"]',
-      '#co_docHeader_citation',
-      '.co_cites',
-      '#coid_website_documentTitle',
-      '.headnotes-title',
-      '#title'
-    ];
-    for (const sel of selectors) {
-      try {
-        const el = document.querySelector(sel);
-        if (el && el.textContent.trim()) {
-          return el.textContent.trim();
-        }
-      } catch (e) {}
-    }
-
-    // Fallback: extract from page title (e.g. "Smith v. Jones, 123 F.3d 456 | Westlaw")
-    const title = document.title || '';
-    const cleaned = title.replace(/\s*[\|\-]\s*Westlaw.*$/i, '').trim();
-    if (cleaned && cleaned !== title.trim()) {
-      return cleaned;
-    }
-  }
-
-  // Auto-detect from LexisNexis pages
-  if (hostname.includes('lexis')) {
-    const selectors = [
-      '.document-title',
-      '[data-testid="doc-title"]',
-      '.case-title'
-    ];
-    for (const sel of selectors) {
-      try {
-        const el = document.querySelector(sel);
-        if (el && el.textContent.trim()) {
-          return el.textContent.trim();
-        }
-      } catch (e) {}
-    }
-
-    const title = document.title || '';
-    const cleaned = title.replace(/\s*[\|\-]\s*Lexis.*$/i, '').trim();
-    if (cleaned && cleaned !== title.trim()) {
-      return cleaned;
-    }
-  }
-
-  return '';
 }
 
 function showCaptureButton(x, y) {
@@ -146,8 +165,10 @@ function hideCaptureButton() {
 
 // Listen for text selection
 document.addEventListener('mouseup', (e) => {
-  // Ignore clicks on the capture button itself
+  // Ignore clicks on our buttons
   if (e.target.id === 'the-hive-capture-btn') return;
+  if (e.target.id === 'the-hive-citation-btn') return;
+  if (e.target.classList && e.target.classList.contains('the-hive-skip-btn')) return;
 
   setTimeout(() => {
     const selection = window.getSelection();
@@ -163,7 +184,7 @@ document.addEventListener('mouseup', (e) => {
   }, 10);
 });
 
-// Hide button when clicking elsewhere
+// Hide capture button when clicking elsewhere (but not citation button)
 document.addEventListener('mousedown', (e) => {
   if (e.target.id !== 'the-hive-capture-btn') {
     hideCaptureButton();
@@ -193,7 +214,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       title: document.title,
       timestamp: new Date().toISOString(),
       source: detectSource(window.location.hostname),
-      citation: detectCitation(window.location.hostname)
+      citation: ''
     });
   }
 });
