@@ -55,10 +55,23 @@ function createCitationButton() {
   citationButton = document.createElement('div');
   citationButton.id = 'the-hive-citation-btn';
   citationButton.style.display = 'none';
+
+  // Main paste area
+  const pasteArea = document.createElement('span');
+  pasteArea.id = 'the-hive-paste-area';
+  pasteArea.textContent = '\u2705 Quote captured!  Copy citation, then click here to paste it';
+  citationButton.appendChild(pasteArea);
+
+  // Skip link
+  const skipLink = document.createElement('span');
+  skipLink.id = 'the-hive-skip-link';
+  skipLink.textContent = 'Skip \u2192';
+  citationButton.appendChild(skipLink);
+
   document.body.appendChild(citationButton);
 
   // "Paste Citation" — reads clipboard and sends both quote + citation
-  citationButton.addEventListener('mousedown', async (e) => {
+  pasteArea.addEventListener('mousedown', async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -73,7 +86,6 @@ function createCitationButton() {
       // Clipboard read failed (permissions) — send without citation
     }
 
-    // Send the captured data with citation to the extension
     chrome.runtime.sendMessage({
       type: 'TEXT_CAPTURED',
       data: pendingQuote
@@ -82,19 +94,24 @@ function createCitationButton() {
     pendingQuote = null;
     hideCitationButton();
   });
+
+  // "Skip" — send quote without citation
+  skipLink.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    skipCitation();
+  });
 }
 
 function showCitationButton() {
   if (!citationButton) createCitationButton();
 
-  // Position fixed at top-center of viewport
   citationButton.style.display = 'flex';
 
   // Auto-dismiss after 30 seconds
   clearTimeout(citationButton._timeout);
   citationButton._timeout = setTimeout(() => {
     if (pendingQuote) {
-      // Send without citation after timeout
       chrome.runtime.sendMessage({
         type: 'TEXT_CAPTURED',
         data: pendingQuote
