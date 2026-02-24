@@ -316,9 +316,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       coaSelect.value = sessionDefaultCoa || '';
     }
 
-    // Reset citation
+    // Pre-fill citation from content script (Westlaw auto-detect) or reset
     const citationInput = document.getElementById('citation-input');
-    if (citationInput) citationInput.value = '';
+    if (citationInput) citationInput.value = data.citation || '';
 
     whyInput.focus();
   }

@@ -291,12 +291,40 @@
     color: #9ca3af;
   }
 
-  .clip-why {
-    font-size: 14px;
+  .clip-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e1b4b;
+    line-height: 1.35;
+    margin-bottom: 2px;
+  }
+  .clip-title a {
+    color: #1e1b4b;
+    text-decoration: none;
+  }
+  .clip-title a:hover {
+    color: #1a56db;
+    text-decoration: underline;
+  }
+  .clip-case-name {
+    font-size: 12px;
     font-weight: 600;
-    color: #1a1a2e;
+    color: #6366f1;
+    margin-bottom: 6px;
+  }
+  .clip-why {
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
     margin-bottom: 6px;
     line-height: 1.4;
+    padding: 6px 10px;
+    background: #fefce8;
+    border-left: 3px solid #eab308;
+    border-radius: 2px;
+  }
+  .clip-why::before {
+    content: '\1F4A1 ';
   }
   .clip-text {
     font-size: 13px;
@@ -326,28 +354,34 @@
   .clip-text-toggle.visible { display: inline-block; }
 
   .clip-citation-row {
-    margin-top: 6px;
+    margin-bottom: 6px;
   }
   .clip-citation-input {
     width: 100%;
     font-size: 12px;
     color: #4b5563;
     font-style: italic;
-    padding: 5px 8px;
-    background: #f8f9ff;
-    border: 1px solid #e0e4f0;
-    border-left: 3px solid #6366f1;
-    border-radius: 2px;
+    padding: 4px 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-left: 3px solid #c7d2fe;
+    border-radius: 0;
     font-family: inherit;
     transition: border-color 0.15s, background 0.15s;
+  }
+  .clip-citation-input:hover {
+    background: #f8f9ff;
+    border-color: #e0e4f0;
+    border-left-color: #6366f1;
   }
   .clip-citation-input:focus {
     outline: none;
     background: #fff;
     border-color: #6366f1;
+    border-left-color: #6366f1;
   }
   .clip-citation-input::placeholder {
-    color: #b0b8cc;
+    color: #c7d2fe;
     font-style: italic;
   }
   .clip-tags {
@@ -991,6 +1025,9 @@
 
       const urlLink = r.url ? `<a href="${escapeHtml(r.url)}" target="_blank" rel="noopener" class="clip-link">&#128279; View Source</a>` : '';
 
+      const titleDisplay = r.pageTitle || r.source || 'Untitled';
+      const caseLabel = currentCase ? `<div class="clip-case-name">\uD83D\uDCC1 ${escapeHtml(currentCase)}</div>` : '';
+
       return `
         <div class="clip-card">
           <div class="clip-header">
@@ -1001,12 +1038,14 @@
             </div>
             <span class="clip-date">${date}</span>
           </div>
-          <div class="clip-why">${escapeHtml(r.why || '')}</div>
-          <div class="clip-text" data-idx="${i}">${textPreview}</div>
-          ${needsToggle ? `<span class="clip-text-toggle visible" data-idx="${i}">Show more</span>` : ''}
+          <div class="clip-title">${r.url ? `<a href="${escapeHtml(r.url)}" target="_blank" rel="noopener">${escapeHtml(titleDisplay)}</a>` : escapeHtml(titleDisplay)}</div>
+          ${caseLabel}
           <div class="clip-citation-row">
             <input type="text" class="clip-citation-input" data-idx="${i}" placeholder="Add citation (e.g., Smith v. Jones, 123 F.3d 456)" value="${escapeHtml(r.citation || '')}" />
           </div>
+          <div class="clip-why">${escapeHtml(r.why || '')}</div>
+          <div class="clip-text" data-idx="${i}">${textPreview}</div>
+          ${needsToggle ? `<span class="clip-text-toggle visible" data-idx="${i}">Show more</span>` : ''}
           ${tagsHtml ? `<div class="clip-tags">${tagsHtml}</div>` : ''}
           <div class="clip-controls">
             <select class="clip-case-select" data-idx="${i}">${caseOptions}</select>

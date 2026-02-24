@@ -38,7 +38,8 @@ function createCaptureButton() {
         url: window.location.href,
         title: document.title,
         timestamp: new Date().toISOString(),
-        source: detectSource(window.location.hostname)
+        source: detectSource(window.location.hostname),
+        citation: detectCitation(window.location.hostname)
       }
     });
 
@@ -54,6 +55,63 @@ function detectSource(hostname) {
   if (hostname.includes('scholar.google')) return 'Google Scholar';
   if (hostname.includes('law.justia')) return 'Justia';
   return hostname;
+}
+
+function detectCitation(hostname) {
+  // Auto-detect citation from Westlaw pages
+  if (hostname.includes('westlaw')) {
+    // Try common Westlaw DOM selectors for citation
+    const selectors = [
+      '#co_docHeaderContainer .co_title',
+      '.document-title .citation',
+      '[data-testid="document-title"]',
+      '#co_docHeader_citation',
+      '.co_cites',
+      '#coid_website_documentTitle',
+      '.headnotes-title',
+      '#title'
+    ];
+    for (const sel of selectors) {
+      try {
+        const el = document.querySelector(sel);
+        if (el && el.textContent.trim()) {
+          return el.textContent.trim();
+        }
+      } catch (e) {}
+    }
+
+    // Fallback: extract from page title (e.g. "Smith v. Jones, 123 F.3d 456 | Westlaw")
+    const title = document.title || '';
+    const cleaned = title.replace(/\s*[\|\-]\s*Westlaw.*$/i, '').trim();
+    if (cleaned && cleaned !== title.trim()) {
+      return cleaned;
+    }
+  }
+
+  // Auto-detect from LexisNexis pages
+  if (hostname.includes('lexis')) {
+    const selectors = [
+      '.document-title',
+      '[data-testid="doc-title"]',
+      '.case-title'
+    ];
+    for (const sel of selectors) {
+      try {
+        const el = document.querySelector(sel);
+        if (el && el.textContent.trim()) {
+          return el.textContent.trim();
+        }
+      } catch (e) {}
+    }
+
+    const title = document.title || '';
+    const cleaned = title.replace(/\s*[\|\-]\s*Lexis.*$/i, '').trim();
+    if (cleaned && cleaned !== title.trim()) {
+      return cleaned;
+    }
+  }
+
+  return '';
 }
 
 function showCaptureButton(x, y) {
@@ -134,7 +192,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       url: window.location.href,
       title: document.title,
       timestamp: new Date().toISOString(),
-      source: detectSource(window.location.hostname)
+      source: detectSource(window.location.hostname),
+      citation: detectCitation(window.location.hostname)
     });
   }
 });
