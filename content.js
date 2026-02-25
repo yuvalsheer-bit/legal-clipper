@@ -139,6 +139,9 @@ function detectSource(hostname) {
 }
 
 function showCaptureButton(x, y) {
+  // Don't show Capture button while waiting for citation paste
+  if (pendingQuote) return;
+
   if (!captureButton) createCaptureButton();
 
   // Position near the selection but within viewport
