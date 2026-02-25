@@ -5,6 +5,24 @@
 let captureButton = null;
 let citationButton = null;
 let pendingQuote = null; // Stores captured quote while waiting for citation
+let hiveEnabled = false; // ON/OFF toggle — default OFF
+
+// Read toggle state on page load
+chrome.storage.local.get(['hiveEnabled'], (data) => {
+  hiveEnabled = data.hiveEnabled === true;
+});
+
+// React to toggle changes from popup (applies to ALL tabs instantly)
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'local' && changes.hiveEnabled) {
+    hiveEnabled = changes.hiveEnabled.newValue === true;
+    if (!hiveEnabled) {
+      hideCaptureButton();
+      hideCitationButton();
+      pendingQuote = null;
+    }
+  }
+});
 
 function createCaptureButton() {
   if (captureButton) return;
@@ -161,6 +179,9 @@ function detectSource(hostname) {
 }
 
 function showCaptureButton(x, y) {
+  // Don't show if extension is turned off
+  if (!hiveEnabled) return;
+
   // Don't show Capture button while waiting for citation paste
   if (pendingQuote) return;
 

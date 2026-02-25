@@ -50,6 +50,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnSaveSettings = document.getElementById('btn-save-settings');
   const settingsFeedback = document.getElementById('settings-feedback');
 
+  // ── Hive Toggle ──
+  const hiveToggleInput = document.getElementById('hive-toggle-input');
+  const hiveToggleLabel = document.getElementById('hive-toggle-label');
+
   // ── Auth Elements ──
   const lockScreen = document.getElementById('lock-screen');
   const setupScreen = document.getElementById('setup-screen');
@@ -116,6 +120,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function showApp() {
     appMain.style.display = 'block';
+
+    // Initialize toggle state from storage
+    const toggleData = await getStorage(['hiveEnabled']);
+    const isEnabled = toggleData.hiveEnabled === true;
+    hiveToggleInput.checked = isEnabled;
+    hiveToggleLabel.textContent = isEnabled ? 'ON' : 'OFF';
+    hiveToggleLabel.classList.toggle('on', isEnabled);
+
     await loadSettings();
 
     // Restore session defaults from storage (survive popup close/reopen)
@@ -148,6 +160,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (view === 'brain') loadBrain();
     });
+  });
+
+  // ── Hive ON/OFF Toggle ──
+  hiveToggleInput.addEventListener('change', () => {
+    const isEnabled = hiveToggleInput.checked;
+    chrome.storage.local.set({ hiveEnabled: isEnabled });
+    hiveToggleLabel.textContent = isEnabled ? 'ON' : 'OFF';
+    hiveToggleLabel.classList.toggle('on', isEnabled);
   });
 
   // ── Draft Persistence ──

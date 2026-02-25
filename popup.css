@@ -164,6 +164,70 @@ body {
   letter-spacing: 0.2px;
 }
 
+/* ── Hive ON/OFF Toggle ── */
+.hive-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hive-toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.hive-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.hive-toggle-slider {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #4b5563;
+  border-radius: 20px;
+  transition: background 0.25s ease;
+}
+
+.hive-toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 2px;
+  bottom: 2px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+}
+
+.hive-toggle input:checked + .hive-toggle-slider {
+  background: #22c55e;
+}
+
+.hive-toggle input:checked + .hive-toggle-slider::before {
+  transform: translateX(16px);
+}
+
+.hive-toggle-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9ca3af;
+  min-width: 22px;
+  transition: color 0.25s ease;
+}
+
+.hive-toggle-label.on {
+  color: #22c55e;
+}
+
 .header-nav {
   display: flex;
   gap: 2px;
