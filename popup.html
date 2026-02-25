@@ -95,22 +95,21 @@
 
     <!-- Capture form -->
     <div id="capture-form" class="capture-form" style="display: none;">
-      <!-- Source badge + title (prominent) -->
-      <div class="source-row">
+      <!-- Source badge + link (compact top row) -->
+      <div class="source-row-compact">
         <span id="source-badge" class="source-badge">Website</span>
-      </div>
-      <div class="source-title-row">
-        <a id="source-link" class="source-link-prominent" href="#" target="_blank" title="Open source">
-          <span id="source-title" class="source-title-prominent"></span>
+        <a id="source-link" href="#" target="_blank" class="source-link-compact">
+          <span id="source-title"></span>
         </a>
       </div>
 
-      <!-- Citation (front and center) -->
-      <div class="citation-container">
-        <div id="citation-input" contenteditable="true" class="citation-display" data-placeholder="&#128206; Add citation (e.g., Smith v. Jones, 123 F.3d 456)"></div>
+      <!-- 1. CITATION — bold and front -->
+      <div class="citation-hero">
+        <label class="field-label">&#128206; Citation</label>
+        <div id="citation-input" contenteditable="true" class="citation-input-bold" data-placeholder="Add citation (e.g., Smith v. Jones, 123 F.3d 456)"></div>
       </div>
 
-      <!-- Why is this crucial? -->
+      <!-- 2. WHY IS THIS CRUCIAL -->
       <div class="why-container">
         <label class="field-label" for="why-input">
           &#128161; Why is this crucial?
@@ -125,56 +124,56 @@
         <div id="why-error" class="field-error" style="display: none;">Please explain why this matters before saving.</div>
       </div>
 
-      <!-- Captured text -->
+      <!-- 3. CAPTURED TEXT -->
       <div class="captured-text-container">
         <label class="field-label">&#128214; Captured Text</label>
         <div id="captured-text" class="captured-text"></div>
         <div id="text-length-warning" class="text-length-warning" style="display: none;"></div>
       </div>
 
-      <!-- Case Name -->
-      <div class="coa-container">
-        <label class="field-label">Case Name <span class="optional">(optional)</span></label>
-        <div class="capture-case-row">
-          <select id="capture-case-select" class="coa-select" style="flex:1;">
-            <option value="">— None —</option>
-          </select>
-          <input type="text" id="capture-case-new-input" class="tag-input" placeholder="Type case name..." style="display:none; flex:1; padding:8px 10px;" />
+      <!-- 4. CASE NAME + CAUSE OF ACTION + RATING (bottom section) -->
+      <div class="bottom-meta">
+        <div class="coa-container" style="margin-bottom: 10px;">
+          <label class="field-label">Case Name <span class="optional">(optional)</span></label>
+          <div class="capture-case-row">
+            <select id="capture-case-select" class="coa-select" style="flex:1;">
+              <option value="">— None —</option>
+            </select>
+            <input type="text" id="capture-case-new-input" class="tag-input" placeholder="Type case name..." style="display:none; flex:1; padding:8px 10px;" />
+          </div>
+          <div class="session-default-row">
+            <label class="session-default-label">
+              <input type="checkbox" id="session-default-check" />
+              Set as session default
+            </label>
+            <span id="session-default-badge" class="session-default-badge" style="display:none;"></span>
+          </div>
         </div>
-        <div class="session-default-row">
-          <label class="session-default-label">
-            <input type="checkbox" id="session-default-check" />
-            Set as session default
-          </label>
-          <span id="session-default-badge" class="session-default-badge" style="display:none;"></span>
-        </div>
-      </div>
-
-      <!-- Cause of Action + Rating (side by side) -->
-      <div class="coa-rating-row">
-        <div class="coa-container" style="flex: 1; margin-bottom: 0;">
-          <label class="field-label">Cause of Action <span class="optional">(optional)</span></label>
-          <select id="coa-select" class="coa-select">
-            <option value="">— None —</option>
-            <option value="CIPA">CIPA</option>
-            <option value="IRPA">IRPA</option>
-            <option value="ECPA">ECPA</option>
-            <option value="ERISA">ERISA</option>
-            <option value="PRICING">PRICING</option>
-            <option value="GREENWASHING">GREENWASHING</option>
-          </select>
-        </div>
-        <div class="coa-container" style="flex: 1; margin-bottom: 0;">
-          <label class="field-label">Rating <span class="optional">(optional)</span></label>
-          <div class="capture-rating-btns" id="capture-rating-btns">
-            <button type="button" class="capture-rating-btn" data-rating="Helpful" title="Helpful">&#9989;</button>
-            <button type="button" class="capture-rating-btn" data-rating="Negative" title="Negative">&#9888;&#65039;</button>
-            <button type="button" class="capture-rating-btn" data-rating="Neutral" title="Neutral">&#10134;</button>
+        <div class="coa-rating-row">
+          <div class="coa-container" style="flex: 1; margin-bottom: 0;">
+            <label class="field-label">Cause of Action <span class="optional">(optional)</span></label>
+            <select id="coa-select" class="coa-select">
+              <option value="">— None —</option>
+              <option value="CIPA">CIPA</option>
+              <option value="IRPA">IRPA</option>
+              <option value="ECPA">ECPA</option>
+              <option value="ERISA">ERISA</option>
+              <option value="PRICING">PRICING</option>
+              <option value="GREENWASHING">GREENWASHING</option>
+            </select>
+          </div>
+          <div class="coa-container" style="flex: 1; margin-bottom: 0;">
+            <label class="field-label">Rating <span class="optional">(optional)</span></label>
+            <div class="capture-rating-btns" id="capture-rating-btns">
+              <button type="button" class="capture-rating-btn" data-rating="Helpful" title="Helpful">&#9989;</button>
+              <button type="button" class="capture-rating-btn" data-rating="Negative" title="Negative">&#9888;&#65039;</button>
+              <button type="button" class="capture-rating-btn" data-rating="Neutral" title="Neutral">&#10134;</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Action buttons -->
+      <!-- 5. ACTION BUTTONS -->
       <div class="action-row">
         <button id="btn-cancel" class="btn btn-secondary">Cancel</button>
         <button id="btn-save" class="btn btn-primary">

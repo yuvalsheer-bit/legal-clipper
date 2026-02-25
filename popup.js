@@ -771,6 +771,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       caseOptions += '<option value="__add_new__">➕ Add new...</option>';
 
+      const citationHtml = r.citation
+        ? `<div class="brain-item-citation">${r.citation}</div>`
+        : '';
+
       return `
         <div class="brain-item">
           <div class="brain-item-header">
@@ -780,6 +784,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <span class="brain-item-date">${date}</span>
           </div>
+          ${citationHtml}
           <div class="brain-item-why">${escapeHtml(r.why || '')}</div>
           <div class="brain-item-text">${r.html ? sanitizeHtml(r.html) : escapeHtml(r.text || '')}</div>
           ${tagsHtml ? `<div class="brain-item-tags">${tagsHtml}</div>` : ''}
