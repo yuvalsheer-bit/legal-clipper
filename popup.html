@@ -95,25 +95,25 @@
 
     <!-- Capture form -->
     <div id="capture-form" class="capture-form" style="display: none;">
-      <!-- Source badge -->
+      <!-- Source badge + title (prominent) -->
       <div class="source-row">
         <span id="source-badge" class="source-badge">Website</span>
-        <a id="source-link" class="source-link" href="#" target="_blank" title="Open source">
-          <span id="source-title" class="source-title"></span>
+      </div>
+      <div class="source-title-row">
+        <a id="source-link" class="source-link-prominent" href="#" target="_blank" title="Open source">
+          <span id="source-title" class="source-title-prominent"></span>
         </a>
       </div>
 
-      <!-- Captured text -->
-      <div class="captured-text-container">
-        <label class="field-label">Captured Text</label>
-        <div id="captured-text" class="captured-text"></div>
-        <div id="text-length-warning" class="text-length-warning" style="display: none;"></div>
+      <!-- Citation (front and center) -->
+      <div class="citation-container">
+        <div id="citation-input" contenteditable="true" class="citation-display" data-placeholder="&#128206; Add citation (e.g., Smith v. Jones, 123 F.3d 456)"></div>
       </div>
 
       <!-- Why is this crucial? -->
       <div class="why-container">
         <label class="field-label" for="why-input">
-          Why is this crucial?
+          &#128161; Why is this crucial?
           <span class="required">*</span>
         </label>
         <textarea
@@ -123,6 +123,13 @@
           rows="3"
         ></textarea>
         <div id="why-error" class="field-error" style="display: none;">Please explain why this matters before saving.</div>
+      </div>
+
+      <!-- Captured text -->
+      <div class="captured-text-container">
+        <label class="field-label">&#128214; Captured Text</label>
+        <div id="captured-text" class="captured-text"></div>
+        <div id="text-length-warning" class="text-length-warning" style="display: none;"></div>
       </div>
 
       <!-- Case Name -->
@@ -143,34 +150,28 @@
         </div>
       </div>
 
-      <!-- Cause of Action -->
-      <div class="coa-container">
-        <label class="field-label">Cause of Action <span class="optional">(optional)</span></label>
-        <select id="coa-select" class="coa-select">
-          <option value="">— None —</option>
-          <option value="CIPA">CIPA</option>
-          <option value="IRPA">IRPA</option>
-          <option value="ECPA">ECPA</option>
-          <option value="ERISA">ERISA</option>
-          <option value="PRICING">PRICING</option>
-          <option value="GREENWASHING">GREENWASHING</option>
-        </select>
-      </div>
-
-      <!-- Rating -->
-      <div class="coa-container">
-        <label class="field-label">Rating <span class="optional">(optional)</span></label>
-        <div class="capture-rating-btns" id="capture-rating-btns">
-          <button type="button" class="capture-rating-btn" data-rating="Helpful" title="Helpful">&#9989; Helpful</button>
-          <button type="button" class="capture-rating-btn" data-rating="Negative" title="Negative">&#9888;&#65039; Negative</button>
-          <button type="button" class="capture-rating-btn" data-rating="Neutral" title="Neutral">&#10134; Neutral</button>
+      <!-- Cause of Action + Rating (side by side) -->
+      <div class="coa-rating-row">
+        <div class="coa-container" style="flex: 1; margin-bottom: 0;">
+          <label class="field-label">Cause of Action <span class="optional">(optional)</span></label>
+          <select id="coa-select" class="coa-select">
+            <option value="">— None —</option>
+            <option value="CIPA">CIPA</option>
+            <option value="IRPA">IRPA</option>
+            <option value="ECPA">ECPA</option>
+            <option value="ERISA">ERISA</option>
+            <option value="PRICING">PRICING</option>
+            <option value="GREENWASHING">GREENWASHING</option>
+          </select>
         </div>
-      </div>
-
-      <!-- Citation -->
-      <div class="coa-container">
-        <label class="field-label">Citation <span class="optional">(optional)</span></label>
-        <div id="citation-input" class="why-input" contenteditable="true" data-placeholder="e.g., Smith v. Jones, 123 F.3d 456 (9th Cir. 2024)" style="height: auto; min-height: 24px; padding: 8px 10px; resize: none;"></div>
+        <div class="coa-container" style="flex: 1; margin-bottom: 0;">
+          <label class="field-label">Rating <span class="optional">(optional)</span></label>
+          <div class="capture-rating-btns" id="capture-rating-btns">
+            <button type="button" class="capture-rating-btn" data-rating="Helpful" title="Helpful">&#9989;</button>
+            <button type="button" class="capture-rating-btn" data-rating="Negative" title="Negative">&#9888;&#65039;</button>
+            <button type="button" class="capture-rating-btn" data-rating="Neutral" title="Neutral">&#10134;</button>
+          </div>
+        </div>
       </div>
 
       <!-- Action buttons -->

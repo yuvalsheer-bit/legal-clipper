@@ -233,7 +233,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
 }
 
 .source-badge {
@@ -249,24 +249,71 @@ body {
   white-space: nowrap;
 }
 
-.source-link {
+.source-title-row {
+  margin-bottom: 6px;
+}
+
+.source-link-prominent {
   text-decoration: none;
-  overflow: hidden;
 }
 
-.source-title {
-  font-size: 12px;
-  color: #4b5563;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.source-title-prominent {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e1b4b;
+  line-height: 1.35;
   display: block;
-  max-width: 260px;
 }
 
-.source-link:hover .source-title {
+.source-link-prominent:hover .source-title-prominent {
   color: #1a56db;
   text-decoration: underline;
+}
+
+.citation-container {
+  margin-bottom: 10px;
+}
+
+.citation-display {
+  font-size: 12px;
+  color: #4b5563;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-left: 3px solid #c7d2fe;
+  background: transparent;
+  min-height: 20px;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+  border-radius: 0;
+  outline: none;
+}
+
+.citation-display:hover {
+  background: #f8f9ff;
+  border-color: #e0e4f0;
+  border-left-color: #6366f1;
+}
+
+.citation-display:focus {
+  background: #fff;
+  border-color: #6366f1;
+  border-left-color: #6366f1;
+}
+
+.citation-display:empty::before {
+  content: attr(data-placeholder);
+  color: #c7d2fe;
+  font-style: italic;
+}
+
+.citation-display i, .citation-display em { font-style: italic; }
+.citation-display u { text-decoration: underline; }
+.citation-display b, .citation-display strong { font-weight: 700; }
+
+.coa-rating-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 /* ── Field Label ── */
