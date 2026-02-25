@@ -56,11 +56,24 @@ function createCitationButton() {
   citationButton.id = 'the-hive-citation-btn';
   citationButton.style.display = 'none';
 
-  // Main paste area
-  const pasteArea = document.createElement('span');
-  pasteArea.id = 'the-hive-paste-area';
-  pasteArea.textContent = '\u2705 Quote captured!  Copy citation, then click here to paste it';
-  citationButton.appendChild(pasteArea);
+  // Label
+  const label = document.createElement('span');
+  label.id = 'the-hive-cite-label';
+  label.textContent = '\u2705 Quote captured! Paste citation:';
+  citationButton.appendChild(label);
+
+  // Paste input
+  const input = document.createElement('input');
+  input.id = 'the-hive-cite-input';
+  input.type = 'text';
+  input.placeholder = 'Ctrl+V to paste citation here...';
+  citationButton.appendChild(input);
+
+  // Save button
+  const saveBtn = document.createElement('span');
+  saveBtn.id = 'the-hive-cite-save';
+  saveBtn.textContent = 'Save \u2713';
+  citationButton.appendChild(saveBtn);
 
   // Skip link
   const skipLink = document.createElement('span');
@@ -70,21 +83,16 @@ function createCitationButton() {
 
   document.body.appendChild(citationButton);
 
-  // "Paste Citation" — reads clipboard and sends both quote + citation
-  pasteArea.addEventListener('mousedown', async (e) => {
-    e.preventDefault();
+  // Stop clicks inside banner from propagating to page
+  citationButton.addEventListener('mousedown', (e) => {
     e.stopPropagation();
+  });
 
+  // Save — attach citation and send
+  function saveCitation() {
     if (!pendingQuote) return;
-
-    try {
-      const clipboardText = await navigator.clipboard.readText();
-      if (clipboardText && clipboardText.trim()) {
-        pendingQuote.citation = clipboardText.trim();
-      }
-    } catch (err) {
-      // Clipboard read failed (permissions) — send without citation
-    }
+    const val = input.value.trim();
+    if (val) pendingQuote.citation = val;
 
     chrome.runtime.sendMessage({
       type: 'TEXT_CAPTURED',
@@ -92,13 +100,23 @@ function createCitationButton() {
     });
 
     pendingQuote = null;
+    input.value = '';
     hideCitationButton();
+  }
+
+  saveBtn.addEventListener('click', saveCitation);
+
+  // Enter key saves
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveCitation();
+    }
   });
 
-  // "Skip" — send quote without citation
-  skipLink.addEventListener('mousedown', (e) => {
+  // Skip — send quote without citation
+  skipLink.addEventListener('click', (e) => {
     e.preventDefault();
-    e.stopPropagation();
     skipCitation();
   });
 }
