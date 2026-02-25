@@ -83,11 +83,6 @@ function createCitationButton() {
 
   document.body.appendChild(citationButton);
 
-  // Stop clicks inside banner from propagating to page
-  citationButton.addEventListener('mousedown', (e) => {
-    e.stopPropagation();
-  });
-
   // Save — attach citation and send
   function saveCitation() {
     if (!pendingQuote) return;
@@ -108,7 +103,11 @@ function createCitationButton() {
     hideCitationButton();
   }
 
-  saveBtn.addEventListener('click', saveCitation);
+  saveBtn.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    saveCitation();
+  });
 
   // Enter key saves
   input.addEventListener('keydown', (e) => {
@@ -119,8 +118,9 @@ function createCitationButton() {
   });
 
   // Skip — send quote without citation
-  skipLink.addEventListener('click', (e) => {
+  skipLink.addEventListener('mousedown', (e) => {
     e.preventDefault();
+    e.stopPropagation();
     skipCitation();
   });
 }
