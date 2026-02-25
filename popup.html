@@ -55,7 +55,13 @@
   <!-- CAPTURE VIEW -->
   <div id="view-capture" class="view active">
     <!-- Empty state: no text selected -->
-    <div id="empty-state" class="empty-state">
+    <!-- Loading splash (shown while checking for pending capture) -->
+    <div id="loading-splash" class="empty-state">
+      <div class="empty-icon">&#129504;</div>
+      <p class="empty-title" style="color: #6366f1;">Entering The Hive...</p>
+    </div>
+
+    <div id="empty-state" class="empty-state" style="display: none;">
       <div class="empty-icon">&#128270;</div>
       <p class="empty-title">No text captured yet</p>
       <p class="empty-desc">Highlight text on any page and click the <strong>Capture</strong> button, or right-click and select <em>"Capture for The Hive"</em>.</p>

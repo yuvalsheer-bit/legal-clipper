@@ -211,6 +211,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ── Check for pending capture from content script ──
+  const loadingSplash = document.getElementById('loading-splash');
+
   async function checkForPendingCapture() {
     // First check for a pending capture from background (highlight or keyboard shortcut)
     try {
@@ -218,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (pending && pending.manualMode) {
         // Keyboard shortcut with no selection — open manual paste with tab info pre-filled
         chrome.runtime.sendMessage({ type: 'CLEAR_PENDING_CAPTURE' });
-        emptyState.style.display = 'none';
+        if (loadingSplash) loadingSplash.style.display = 'none';
         manualForm.style.display = 'block';
         manualText.value = '';
         manualSource.value = pending.title || '';
@@ -229,6 +231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
       if (pending && pending.text) {
+        if (loadingSplash) loadingSplash.style.display = 'none';
         showCaptureForm(pending);
         chrome.runtime.sendMessage({ type: 'CLEAR_PENDING_CAPTURE' });
         return;
@@ -241,14 +244,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (tab && tab.id) {
         const response = await chrome.tabs.sendMessage(tab.id, { type: 'GET_SELECTION' });
         if (response && response.text) {
+          if (loadingSplash) loadingSplash.style.display = 'none';
           showCaptureForm(response);
           return;
         }
       }
     } catch (e) {}
 
-    // Finally, try to restore a saved draft
-    await restoreDraft();
+    // Nothing found — hide splash, show empty state or restore draft
+    if (loadingSplash) loadingSplash.style.display = 'none';
+    const restored = await restoreDraft();
+    if (!restored) {
+      emptyState.style.display = 'block';
+    }
   }
 
   // ── Show Capture Form ──
