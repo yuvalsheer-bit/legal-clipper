@@ -62,11 +62,11 @@ function createCitationButton() {
   label.textContent = '\u2705 Quote captured! Paste citation:';
   citationButton.appendChild(label);
 
-  // Paste input
-  const input = document.createElement('input');
+  // Paste input (contenteditable to preserve formatting like italics/underline)
+  const input = document.createElement('div');
   input.id = 'the-hive-cite-input';
-  input.type = 'text';
-  input.placeholder = 'Ctrl+V to paste citation here...';
+  input.contentEditable = 'true';
+  input.setAttribute('data-placeholder', 'Ctrl+V to paste citation here...');
   citationButton.appendChild(input);
 
   // Save button
@@ -91,8 +91,12 @@ function createCitationButton() {
   // Save — attach citation and send
   function saveCitation() {
     if (!pendingQuote) return;
-    const val = input.value.trim();
-    if (val) pendingQuote.citation = val;
+    // Get HTML content to preserve italics, underline, bold
+    const html = input.innerHTML.trim();
+    // Strip if only whitespace/empty tags
+    if (html && html !== '<br>' && html !== '<div><br></div>') {
+      pendingQuote.citation = html;
+    }
 
     chrome.runtime.sendMessage({
       type: 'TEXT_CAPTURED',
@@ -100,7 +104,7 @@ function createCitationButton() {
     });
 
     pendingQuote = null;
-    input.value = '';
+    input.innerHTML = '';
     hideCitationButton();
   }
 

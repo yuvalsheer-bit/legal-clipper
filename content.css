@@ -68,7 +68,8 @@
 }
 
 #the-hive-cite-input {
-  width: 280px;
+  min-width: 280px;
+  max-width: 500px;
   padding: 6px 10px;
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 6px;
@@ -78,15 +79,31 @@
   font-size: 13px;
   outline: none;
   user-select: text;
+  cursor: text;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-#the-hive-cite-input::placeholder {
+#the-hive-cite-input:empty::before {
+  content: attr(data-placeholder);
   color: rgba(255, 255, 255, 0.5);
 }
 
 #the-hive-cite-input:focus {
   border-color: #818cf8;
   background: rgba(255, 255, 255, 0.25);
+}
+
+#the-hive-cite-input i, #the-hive-cite-input em {
+  font-style: italic;
+}
+
+#the-hive-cite-input u {
+  text-decoration: underline;
+}
+
+#the-hive-cite-input b, #the-hive-cite-input strong {
+  font-weight: 700;
 }
 
 #the-hive-cite-save {

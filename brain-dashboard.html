@@ -360,7 +360,6 @@
     width: 100%;
     font-size: 12px;
     color: #4b5563;
-    font-style: italic;
     padding: 4px 8px;
     background: transparent;
     border: 1px solid transparent;
@@ -368,6 +367,8 @@
     border-radius: 0;
     font-family: inherit;
     transition: border-color 0.15s, background 0.15s;
+    cursor: text;
+    min-height: 20px;
   }
   .clip-citation-input:hover {
     background: #f8f9ff;
@@ -380,9 +381,19 @@
     border-color: #6366f1;
     border-left-color: #6366f1;
   }
-  .clip-citation-input::placeholder {
+  .clip-citation-input:empty::before {
+    content: attr(data-placeholder);
     color: #c7d2fe;
     font-style: italic;
+  }
+  .clip-citation-input i, .clip-citation-input em {
+    font-style: italic;
+  }
+  .clip-citation-input u {
+    text-decoration: underline;
+  }
+  .clip-citation-input b, .clip-citation-input strong {
+    font-weight: 700;
   }
   .clip-tags {
     display: flex;
@@ -1061,7 +1072,7 @@
           <div class="clip-title">${r.url ? `<a href="${escapeHtml(r.url)}" target="_blank" rel="noopener">${escapeHtml(titleDisplay)}</a>` : escapeHtml(titleDisplay)}</div>
           ${caseLabel}
           <div class="clip-citation-row">
-            <input type="text" class="clip-citation-input" data-idx="${i}" placeholder="Add citation (e.g., Smith v. Jones, 123 F.3d 456)" value="${escapeHtml(r.citation || '')}" />
+            <div class="clip-citation-input" contenteditable="true" data-idx="${i}" data-placeholder="Add citation (e.g., Smith v. Jones, 123 F.3d 456)">${r.citation || ''}</div>
           </div>
           <div class="clip-why">${escapeHtml(r.why || '')}</div>
           <div class="clip-text" data-idx="${i}">${textPreview}</div>
@@ -1245,15 +1256,15 @@
     });
 
     // ── Citation input handlers (save on blur or Enter) ──
-    let citationDebounce = null;
     clipList.querySelectorAll('.clip-citation-input').forEach(input => {
       input.addEventListener('blur', () => {
         const idx = parseInt(input.dataset.idx);
         const r = filteredRecords[idx];
-        const newCitation = input.value.trim();
-        if (newCitation !== (r.citation || '')) {
-          r.citation = newCitation;
-          updateRecord(r.id, { citation: newCitation });
+        const newCitation = input.innerHTML.trim();
+        const cleaned = newCitation === '<br>' ? '' : newCitation;
+        if (cleaned !== (r.citation || '')) {
+          r.citation = cleaned;
+          updateRecord(r.id, { citation: cleaned });
           flashSaved(idx);
         }
       });

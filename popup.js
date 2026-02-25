@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       manualSource: manualSource ? manualSource.value : '',
       manualUrl: manualUrl ? manualUrl.value : '',
       why: whyInput ? whyInput.value : '',
-      citation: citationInput ? citationInput.value : '',
+      citation: citationInput ? citationInput.innerHTML : '',
       // Track which screen was showing
       screen: manualForm.style.display === 'block' ? 'manual'
             : captureForm.style.display === 'block' ? 'capture'
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       whyInput.value = d.why || '';
       const citationInput = document.getElementById('citation-input');
-      if (citationInput) citationInput.value = d.citation || '';
+      if (citationInput) citationInput.innerHTML = d.citation || '';
       return true;
     }
 
@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Pre-fill citation (from two-step clipboard capture or empty)
     const citationInput = document.getElementById('citation-input');
-    if (citationInput) citationInput.value = data.citation || '';
+    if (citationInput) citationInput.innerHTML = data.citation || '';
 
     whyInput.focus();
   }
@@ -605,7 +605,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       causeOfAction: coaSelect ? coaSelect.value : '',
       caseName: caseName,
       rating: captureRating,
-      citation: citationInput ? citationInput.value.trim() : ''
+      citation: citationInput ? citationInput.innerHTML.trim() : ''
     };
 
     // Auto-set session defaults so next clip keeps the same case + COA
