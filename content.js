@@ -107,19 +107,7 @@ function showCitationButton() {
   if (!citationButton) createCitationButton();
 
   citationButton.style.display = 'flex';
-
-  // Auto-dismiss after 30 seconds
-  clearTimeout(citationButton._timeout);
-  citationButton._timeout = setTimeout(() => {
-    if (pendingQuote) {
-      chrome.runtime.sendMessage({
-        type: 'TEXT_CAPTURED',
-        data: pendingQuote
-      });
-      pendingQuote = null;
-    }
-    hideCitationButton();
-  }, 30000);
+  // Banner stays visible until user clicks "Paste" or "Skip" — no timeout
 }
 
 function hideCitationButton() {
