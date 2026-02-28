@@ -1277,6 +1277,14 @@
     });
   }
 
+  // ── Strip HTML to plain text ──
+  function stripHtml(html) {
+    if (!html) return '';
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || '';
+  }
+
   // ── Format Broadcast Message ──
   function formatBroadcast(record) {
     const title = record.pageTitle || record.source || 'something interesting';
@@ -1284,7 +1292,7 @@
     let msg = `📌 ${title}\n\n`;
     msg += `💡 Why it matters: ${record.why}\n\n`;
     msg += `📖 Key Quote:\n"${record.text}"\n\n`;
-    if (record.citation) msg += `📎 Citation: ${record.citation}\n`;
+    if (record.citation) msg += `📎 Citation: ${stripHtml(record.citation)}\n`;
     if (record.url) msg += `🔗 ${record.url}\n`;
     if (record.tags) msg += `\n#${record.tags.split(',').map(t => t.trim()).join(' #')}`;
     return msg;
@@ -1367,7 +1375,7 @@
         s += `  ${i + 1}. 📌 ${source}\n`;
         s += `     💡 Why it matters: ${r.why || ''}\n`;
         s += `     📖 Key Quote:\n     "${r.text || ''}"\n`;
-        if (r.citation) s += `     📎 Citation: ${r.citation}\n`;
+        if (r.citation) s += `     📎 Citation: ${stripHtml(r.citation)}\n`;
         if (r.url) s += `     🔗 ${r.url}\n`;
         s += '\n';
       });

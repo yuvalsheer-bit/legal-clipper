@@ -659,13 +659,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnSaveSpinner.style.display = 'none';
   });
 
+  function stripHtml(html) {
+    if (!html) return '';
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || '';
+  }
+
   function formatBroadcast(record) {
     const title = record.pageTitle || record.source || 'something interesting';
 
     let msg = `\uD83D\uDCCC ${title}\n\n`;
     msg += `\uD83D\uDCA1 Why it matters: ${record.why}\n\n`;
     msg += `\uD83D\uDCD6 Key Quote:\n"${record.text}"\n\n`;
-    if (record.citation) msg += `\uD83D\uDCCE Citation: ${record.citation}\n`;
+    if (record.citation) msg += `\uD83D\uDCCE Citation: ${stripHtml(record.citation)}\n`;
     if (record.url) msg += `\uD83D\uDD17 ${record.url}\n`;
     if (record.tags) msg += `\n#${record.tags.split(',').map(t => t.trim()).join(' #')}`;
     return msg;
@@ -1089,7 +1096,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         s += `  ${i + 1}. 📌 ${source}\n`;
         s += `     💡 Why it matters: ${r.why || ''}\n`;
         s += `     📖 Key Quote:\n     "${r.text || ''}"\n`;
-        if (r.citation) s += `     📎 Citation: ${r.citation}\n`;
+        if (r.citation) s += `     📎 Citation: ${stripHtml(r.citation)}\n`;
         if (r.url) s += `     🔗 ${r.url}\n`;
         s += '\n';
       });
